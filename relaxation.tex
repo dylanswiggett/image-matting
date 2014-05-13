@@ -1,0 +1,8 @@
+A common problem in computation, and one we will have to address for foreground/background matting, is the solution of large systems of linear equations. We denote these as in \cite{briggs87} by
+\[A\textbf{u}=\textbf{f}\]
+As shown later, the systems of linear equations involved are massive for even reasonably sized images, and although direct solutions are possible, they are difficult to approach both in theory \cite[pg.4]{briggs87} and in practice \cite{lee14}. Instead, we take an iterative approach. We take an approximation of $\textbf{u}$, denoted $\textbf{v}$. This approximation might be initially very rough, but through successive iterations our approximation should converge towards $\textbf{u}$. To formalize this, we define the \textbf{error} ($\textbf{e}$) and the \textbf{residual} ($\textbf{r}$) by
+\[\textbf{e}=\textbf{u}-\textbf{v}\hspace{.5in}
+  \textbf{r}=\textbf{f}-A\textbf{v}\]
+We then note that, in combination with our original system of equations, we have that
+\[A\textbf{e}=\textbf{r}\]
+This is known as the \textbf{residual equation} \cite{briggs87}. While the error is not immediately available unless the system of equations is already solved, the residual can be calculated at any intermediate step, so this gives us a first clue as to how an iterative step might be produced.
