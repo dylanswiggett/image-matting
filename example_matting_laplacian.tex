@@ -1,4 +1,4 @@
-I here outline the Matting Laplacian (and derivation) performed in \cite{levin08}. Although many alternate (and often simpler) affinity functions are documented, this one is both common and rigorous. This solution makes a few small simplifying assumption. The first is that the foreground and background images are locally smooth. This leads to sudden changes in the image color being attributed to sudden changes in $\alpha$, a reasonable expectation. The second is that the image is greyscale, which significantly simplifies calculations and can be worked around later. Given this second assumption, greyscale values will throughout this paper be treated as bounded real numbers.
+I here outline the Matting Laplacian (and derivation) performed in \cite{levin08}. Although many alternate (and often simpler) affinity functions are documented, this one is both common and rigorous. This solution makes a few small simplifying assumptions. The first is that the foreground and background images are locally smooth. This leads to sudden changes in the image color being attributed to sudden changes in $\alpha$, a reasonable expectation. The second is that the image is greyscale, which significantly simplifies calculations and can be worked around later. Given this second assumption, greyscale values will throughout this paper be treated as bounded real numbers.
 \\\\
 From the smoothness assumption, we can locally treat our values of $\alpha$ as a linear function, conditioned on known values for $F$ and $B$, the foreground and background images. Taking $a=\frac{1}{F-B}$ and $b=-\frac{B}{F-B}$, we define our matte by
 \[\alpha_i=aI_i+b\]
@@ -24,12 +24,12 @@ where $L$ is an $N\times N$ matrix with
 where $\delta_{ij}$ is the Kronecker delta, $\mu_k$ and $\sigma_k$ are the mean and std. dev. of the color in box $w_k$, and $|w_k|$ is the number of pixels in $w_k$.
 \end{matlapthm}
 \begin{proof}
-For each $w_k$, we define the $(|w_k|+1)\times2$ matrix $G_k$ where the first $|w_k|$ rows are $[I_i,1]$ for each $i\in w_k$, and the last row is $[\sqrt{\epsilon},0]$. Next we define the $(|w_k|+1)\times1$ matrix $\overline{\alpha_k}$ where the first $i$ rows are the values of $\alpha_i$ for $i\in w_k$ and the last is $0$. We can then rewrite $J(\alpha,a,b)$ as
+For each $w_k$, we define the $(|w_k|+1)\times2$ matrix $G_k$ where the first $|w_k|$ rows are $[I_i,1]$ for each $i\in w_k$, and the last row is $[\sqrt{\epsilon},0]$. Next we define the $(|w_k|+1)\times1$ matrix $\bar{\alpha}_k$ where the first $i$ rows are the values of $\alpha_i$ for $i\in w_k$ and the last is $0$. We can then rewrite $J(\alpha,a,b)$ as
 \[J(\alpha,a,b)=\sum_k\left\Vert
 G_k\left[\begin{array}{cc}
 a_k \\ b_k
 \end{array}\right]
- - \overline{\alpha_k}
+ - \bar{\alpha}_k
 \right\Vert^2\]
 We want to find the optimal values of $a$ and $b$, $a_k^{*},b_k^{*}$ for each $k$ in our window, but by least squares minimization this is now simply
 \[(a_k^*,b_k^*)=\text{argmin}\,
@@ -37,7 +37,17 @@ We want to find the optimal values of $a$ and $b$, $a_k^{*},b_k^{*}$ for each $k
 G_k\left[\begin{array}{cc}
 a_k \\ b_k
 \end{array}\right]
- - \overline{\alpha_k}
-\right\Vert=(G_k^{T}G_k)^{-1}G_k^{T}\overline{\alpha_k}\]
-
+ - \bar{\alpha}_k
+\right\Vert=(G_k^{T}G_k)^{-1}G_k^{T}\bar{\alpha}_k\]
+We now define $\bar{G}_k=I-G_k(G_k^TG_k)^{-1}G_k^T$, and can rewrite
+\[J(\alpha)=
+	\sum_k\bar{\alpha}_k^T\bar{G}_k^T
+	      \bar{G}_k\bar{\alpha}_k\]
+Note that in this form, we have minimized $J$ in one variable rather than $3$. Finally, we expand our middle terms, $\bar{G}_k^T \bar{G}_k$, and find by algebra that
+\[\bar{G}_k^T \bar{G}_k=\left(
+	\delta_{ij}-\frac{1}{|w_k|}\left[
+	1+\frac{1}{\frac{\epsilon}{|w_k|}+\sigma_k^2}
+	(I_i-\mu_k)(I_j-\mu_k)
+\right]\right)\]
+\textbf{(For my final draft, I will show the steps to produce this equality)}. Plugging this back into our formula for $J(\alpha)$ and rewriting our sum as matrix composition, we have our desired equation.
 \end{proof}
