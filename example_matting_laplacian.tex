@@ -1,0 +1,18 @@
+I here outline the Matting Laplacian (and derivation) performed in \cite{levin08}. Although many alternate (and often simpler) affinity functions are documented, this one is both common and rigorous. This solution makes a few small simplifying assumption. The first is that the foreground and background images are locally smooth. This leads to sudden changes in the image color being attributed to sudden changes in $\alpha$, a reasonable expectation. The second is that the image is greyscale, which significantly simplifies calculations and can be worked around later. Given this second assumption, greyscale values will throughout this paper be treated as bounded real numbers.
+\\\\
+From the smoothness assumption, we can locally treat our values of $\alpha$ as a linear function, conditioned on known values for $F$ and $B$, the foreground and background images. Taking $a=\frac{1}{F-B}$ and $b=-\frac{B}{F-B}$, we define our matte by
+\[\alpha_i=aI_i+b\]
+for all values of $i$ in a small section of the image. These values of $a$ and $b$ can be justified by noting that $I_i\in[B_i,F_i]$, and the chosen $a$ and $b$ produce $\alpha_i:\,[B_i,F_i]\to[0,1]$, as expected.
+\\\\
+Solving for $F$ and $B$ is now equivalent to solving for $a$ and $b$. This is done by minimizing a cost function that is chosen in \cite{levin08} to be
+\[J(\alpha,a,b)=
+	\sum_{j\in I}\left(\sum_{i\in w_j}\left(
+		\alpha_i-a_jI_i-b_j\right)^2+\epsilon
+		a_j^2\right)\]
+with $w_j$ a small box around the pixel $j$. The last term of the sum serves to minimize $a_j$ where possible, and acts to both smooth the matte as a whole, and to resolve convergence where results might otherwise be indeterminate (e.g. a box where the image color is constant). Since the minimal values in each box are determinate, and since they overlap at nearby pixels, this cost function allows local changes to propogate through their neighbors. Cost minimization is solved in \cite{levin08} as follows.
+
+\newtheorem{matlapthm}{Theorem}
+\begin{matlapthm}
+\end{matlapthm}
+\begin{proof}
+\end{proof}
