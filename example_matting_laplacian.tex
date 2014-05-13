@@ -9,10 +9,35 @@ Solving for $F$ and $B$ is now equivalent to solving for $a$ and $b$. This is do
 	\sum_{j\in I}\left(\sum_{i\in w_j}\left(
 		\alpha_i-a_jI_i-b_j\right)^2+\epsilon
 		a_j^2\right)\]
-with $w_j$ a small box around the pixel $j$. The last term of the sum serves to minimize $a_j$ where possible, and acts to both smooth the matte as a whole, and to resolve convergence where results might otherwise be indeterminate (e.g. a box where the image color is constant). Since the minimal values in each box are determinate, and since they overlap at nearby pixels, this cost function allows local changes to propogate through their neighbors. Cost minimization is solved in \cite{levin08} as follows.
+with $w_j$ a small box around the pixel $j$. The last term of the sum serves to minimize $a_j$ where possible, and acts to both smooth the matte as a whole, and to resolve convergence where results might otherwise be indeterminate (e.g. a box where the image color is constant). Since the minimal values in each box are determinate, and since they overlap at nearby pixels, this cost function allows local changes to propagate through their neighbors. Cost minimization is solved in \cite{levin08} as follows.
 
 \newtheorem{matlapthm}{Theorem}
 \begin{matlapthm}
+We define $J(\alpha)$ to be $\min\limits_{a,b} J(\alpha,a,b)$. Then
+\[J(\alpha)=\alpha^{T}L\alpha\]
+where $L$ is an $N\times N$ matrix with
+\[L_{i,j}=\sum_{k|(i,j)\in w_k}\left(
+	\delta_{ij}-\frac{1}{|w_k|}\left[
+	1+\frac{1}{\frac{\epsilon}{|w_k|}+\sigma_k^2}
+	(I_i-\mu_k)(I_j-\mu_k)
+\right]\right)\]
+where $\delta_{ij}$ is the Kronecker delta, $\mu_k$ and $\sigma_k$ are the mean and std. dev. of the color in box $w_k$, and $|w_k|$ is the number of pixels in $w_k$.
 \end{matlapthm}
 \begin{proof}
+For each $w_k$, we define the $(|w_k|+1)\times2$ matrix $G_k$ where the first $|w_k|$ rows are $[I_i,1]$ for each $i\in w_k$, and the last row is $[\sqrt{\epsilon},0]$. Next we define the $(|w_k|+1)\times1$ matrix $\overline{\alpha_k}$ where the first $i$ rows are the values of $\alpha_i$ for $i\in w_k$ and the last is $0$. We can then rewrite $J(\alpha,a,b)$ as
+\[J(\alpha,a,b)=\sum_k\left\Vert
+G_k\left[\begin{array}{cc}
+a_k \\ b_k
+\end{array}\right]
+ - \overline{\alpha_k}
+\right\Vert^2\]
+We want to find the optimal values of $a$ and $b$, $a_k^{*},b_k^{*}$ for each $k$ in our window, but by least squares minimization this is now simply
+\[(a_k^*,b_k^*)=\text{argmin}\,
+\left\Vert
+G_k\left[\begin{array}{cc}
+a_k \\ b_k
+\end{array}\right]
+ - \overline{\alpha_k}
+\right\Vert=(G_k^{T}G_k)^{-1}G_k^{T}\overline{\alpha_k}\]
+
 \end{proof}
