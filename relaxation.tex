@@ -5,4 +5,26 @@ As shown later, the systems of linear equations involved are massive for even re
   \textbf{r}=\textbf{f}-A\textbf{v}\]
 We then note that, in combination with our original system of equations, we have that
 \[A\textbf{e}=\textbf{r}\]
-This is known as the \textbf{residual equation} \cite{briggs87}. While the error is not immediately available unless the system of equations is already solved, the residual can be calculated at any intermediate step, so this gives us a first clue as to how an iterative step might be produced.
+This is known as the \textbf{residual equation} \cite{briggs87}. While the error is not immediately available unless the system of equations is already solved, the residual can be calculated at any intermediate step, so this gives us a first clue as to how an iterative step might be produced:
+\[\textbf{u}=\textbf{v}+\textbf{e}=
+	\textbf{v}+A^{-1}\textbf{r}=P\textbf{v}+\textbf{g}\]
+Since $A^{-1}$ is usually very difficult to compute, the goal of \textbf{relaxation} is to find some approximation, $B$ (or $P$ and $\textbf{g}$, depending on notation). We denote the residual and approximation after $n$ steps by $\textbf{r}^{(n)}$ and $\textbf{v}^{(n)}$, and rephrase our goal as finding a $B\approx A^{-1}$ such that
+\[\textbf{v}^{(n+1)}=\textbf{v}^{(n)}+B\textbf{r}^{(n)}
+	=P\textbf{v}^{(n)}+\textbf{g},
+\hspace{.5in}
+	\lim\limits_{n\to\infty}
+		\left\Vert\textbf{r}\right\Vert^{(n)}=
+	\lim\limits_{n\to\infty}
+	\left\Vert\textbf{e}\right\Vert^{(n)}=0\]
+These notations are mathematically equivalent, but going forward we will use the $P$ and $\textbf{g}$ notation. Now, we can see that if some solution $\textbf{u}$ does exist, it satisfies
+\[\textbf{u}=P\textbf{u}+\textbf{g}\]
+So we have that
+\[\textbf{e}^{(1)}=\textbf{u}-\textbf{v}^{(1)}
+=(P\textbf{u}+\textbf{g})-(P\textbf{v}^{(0)}+\textbf{g})
+=P\textbf{e}^{(0)}\]
+Extending this through multiple iterations,
+\[\textbf{e}^{(n)}=P^n\textbf{e}^{(0)}\hspace{.5in}
+\left\Vert\textbf{e}^{(n)}\right\Vert\leq
+\left\Vert P\right\Vert^n
+	\left\Vert\textbf{e}^{(0)}\right\Vert\]
+So our constraint to guarantee convergence is that the \textbf{spectral radius} of $P$ (the maximum norm of its eigenvectors) is less than $1$. We will demonstrate an example for which this is true in \textbf{Techniques}.
