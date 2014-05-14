@@ -1,0 +1,51 @@
+Two of the most common relaxation algorithms are the \textbf{Jacobi} method and the \textbf{Gauss-Seidel} method. Both are of simple matrix form \[\textbf{v}^{(n+1)}=P\textbf{v}^{(n)}+\textbf{g}\] but the Gauss-Seidel method is used both in \cite{lee14} and in this paper. This choice is made because the Gauss-Seidel method is easier to apply computationally \cite{briggs87} and converges about twice as fast as the Jacobi method \cite{lee14}. We start, as with any other relaxation method, with the system of linear equations:
+\[A\textbf{u}=\textbf{f}\]
+where $A$ is an $N\times N$ matrix. We start by partitioning $A$ as a sum of two triangular matrices, which we denote by $L$ (lower) and $U$ (upper).
+\[L=
+\left[\begin{array}{ccccc}
+A_{00} & 0 & 0 & \cdots & 0 \\
+A_{10} & A_{11} & 0 & \cdots & 0 \\
+A_{20} & A_{21} & A_{22} & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+A_{N0} & A_{N1} & A_{N2} & \cdots & A_{NN}
+\end{array}\right]
+\hspace{.15in}
+U=
+\left[\begin{array}{ccccc}
+0 & A_{01} & A_{02} & \cdots & A_{0N} \\
+0 & 0 & A_{12} & \cdots & A_{1N} \\
+0 & 0 & 0 & \cdots & A_{2N} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 0
+\end{array}\right]\]
+We can now return to our original equation, but now rewritten as
+\[(L+U)\textbf{u}=f\Rightarrow
+L\textbf{u}=-U\textbf{u}+\textbf{f}\Rightarrow
+\textbf{u}=-UL^{-1}\textbf{u}+L^{-1}\textbf{f}\]
+This immediately resembles a relaxation formula, with $P=-UL^{-1}$ and $\textbf{g}=L^{-1}\textbf{f}$. Further, the triangular matrix $L$ is computationally simple to invert. All that remains is to show convergence when applied to approximate solutions. In fact, in this situation, $\rho(A)\leq 1-a/N^2<1$, for some positive constant $a$ \cite{lee14}. Then we know that convergence will occur, although perhaps quite slowly. Unfortunately, slow convergence is usually the case. To demonstrate this, an example used in both \cite{lee14} and \cite{briggs87} is here supplied:
+\begin{quote}
+\item
+\subparagraph{Example}
+Consider a system of linear equations with boundary values on the one dimensional grid $u_0,u_1,\ldots,u_N$:
+\[-u_{j-1}+2u_j-u_{j+1}=0\hspace{.2in}(1\leq j\leq N-1),
+\hspace{.5in}u_0=u_N=0\]
+The grid is exactly $1$ wide, so the points are spaced $h=1/N$ apart.
+This problem is selected due to its trivial, unique solution:
+\[u_0=u_1=\cdots=u_N=0\]
+And due to its simple $A$:
+\[A=
+\left[\begin{array}{ccccccc}
+1 & 2 & 1 & 0 & 0 & \cdots & 0 \\
+0 & 1 & 2 & 1 & 0 & \cdots & 0 \\
+0 & 0 & 1 & 2 & 1 & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \ddots & \ddots & \vdots \\
+0 & 0 & 0 & \cdots & 1 & 2 & 1
+\end{array}\right]\]
+This matrix has eigenfunctions and eigenvalues
+\[v^h_{(k)i}=\sin(k\pi ih)/h\hspace{.3in}
+\lambda_i^h=2-2\cos(\pi ih)\]
+Although this is a simplified model, such oscillatory eigenfunctions are found in all graph laplacians \cite{lee14}. Similarly, when we produce our relaxation matrix $P$ from Gauss-Seidel, its eigenvalues are
+\[\mu_i^h=\cos^2(\pi i h)\]
+This does not bode well for convergence. We take $\textbf{v}$ to be our initial estimate for $\textbf{u}$, and as previously we define $\textbf{e}=\textbf{v}-\textbf{u}$. From our eigenfunctions, we now see that highly oscillatory components of our $\textbf{e}$ converge to $0$ rapidly, but less oscillatory components converge at a rate close to $1$. Further, since our eigenfunctions are exactly these oscillatory components, only the amplitude is damped, while the frequency is left unchanged. In practice, this means that after a few iterations, the high frequency components vanish and the low frequency components are left behind, and require an immense number of iterations to satisfactorily remove. This behavior is known as \textbf{smoothing}, and is an unfortunate property of most relaxing methods \cite{briggs87}.
+\end{quote}
+Although we now have in the Gauss-Seidel method a convergant relaxation matrix, another step is clearly needed to make its use computationally feasible (both in theory and in practice). No known matting laplacian solvers avoid this behavior, so a workaround is necessary \cite{lee14}.

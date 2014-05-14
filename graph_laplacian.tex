@@ -1,4 +1,4 @@
 We have a non-looping, unweighted, and undirected graph. We take $v_i$ to be an indexing of its vertices.
 We first define the \textbf{degree matrix} of our graph, $D$, to be a diagonal matrix where $D_{ii}$ is the degree of $v_i$ (the number of adjacent edges).
-Next, we define the \textbf{adjacency matrix} of our graph, $A$, a symmetric matrix where $A_{ij}=1$ iff there is an edge between $v_i$ and $v_j$. Note that, since our graph is non-looping, $A_{ii}=0$.
-The \textbf{Graph Laplacian}, $L$, of our graph is now defined as $L=D-A$ \cite{weisstein}.
+Next, we define the \textbf{adjacency matrix} of our graph, $W$, a symmetric matrix where $W_{ij}=1$ iff there is an edge between $v_i$ and $v_j$. Note that, since our graph is non-looping, $W_{ii}=0$.
+The \textbf{Graph Laplacian}, $L$, of our graph is now defined as $L=D-W$ \cite{weisstein}.

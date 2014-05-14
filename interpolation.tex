@@ -1,0 +1,9 @@
+As we will later see, it is sometimes necessary to upsample or downsample a matrix. This is done by creating two operators, known as the \textbf{interpolation} operator and the \textbf{restriction} operator. How they are defined is generally context specific, but their basic purpose is to produce what amounts to a zoomed in or zoomed out view of a grid. Throughout this paper, the notation used in \cite{lee14} and \cite{briggs87} will be used. An interpolation operator maps a grid of values spaced $2h$ apart to a grid of values spaced $h$ apart, and is denoted $I_{2h}^h$. A restriction operator maps a grid of values spaced $h$ apart to a grid spaced $2h$ apart, and is similarly denoted $I_h^{2h}$. As shorthand, wherever a value such as $v_i$ is used to denote the $i$th element of a grid, $v_i^h$ will be used to denote the $i$th element of the grid with spacing $h$. For example, $I_{2h}^h\textbf{v}^{2h}=\textbf{v}^h$ and $\textbf{v}^{2h}=I_{h}^{2h}\textbf{v}^h$.
+\\\\
+The most basic example of an interpolation operator is the linear interpolation operator, here presented for a vector of values $v_j$:
+\[v_{2j}^h=v_j^{2h}\hspace{.5in}
+v_{2j+1}^h=\frac{1}{2}\left(v_j^{2h}+v_{j+1}^{2h}\right)\]
+The restriction operator, which approximately reverses interpolation, is most easily calculated by $v_j^{2j}=v_{2j}^h$, known as \textbf{injection}. However, a weighted restriction operator often performs better. For example:
+\[v_j^{2h}=\frac{1}{4}\left(
+	v_{2j-1}^h+2v_{2j}^h+v_{2j+1}^h\right)\]
+Although these operators have only been defined on a one dimensional grid, similar constructions can be used for $n$-dimensional grids.
