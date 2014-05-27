@@ -18,7 +18,7 @@ Our $A^{h}$ and $\textbf{r}^{h}$ are known, and the initial guess for $\textbf{e
 \end{quote}
 This method is quite effective, but only if the error is relatively smooth. Namely, the interpolation operation at the final step must make a good approximation of the actual error. However, we now have an algorithm that preserves corrections to smooth error but not oscillatory error. Clearly, combining this with a relaxation method such as Gauss-Seidel could have good results.
 \\\\
-This combination leads to what is known as the \textbf{V-Cycle Method}, so called of the V-like shape in which it first restricts repeately, then interpolates repeatedly. Following is the pseudocode for this algorithm in \cite{lee14}:
+This combination leads to what is known as the \textbf{V-Cycle Method}, so called for the V-like shape in which it first restricts repeately, then interpolates repeatedly. Following is the pseudocode for this algorithm in \cite{lee14}:
 \vspace{-.2in}
 \begin{quote}
 \item
