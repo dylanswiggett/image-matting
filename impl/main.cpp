@@ -7,27 +7,41 @@
 
 using namespace boost::numeric::ublas;
 
-#define SIZE 3000
+#define SIZE 1000
 
 int main(int argc, char** argv) {
-  compressed_matrix<double> *m1;
-  compressed_matrix<double> *m2;
+  compressed_matrix<double> *m;
 
-  m1 = new compressed_matrix<double>(SIZE,SIZE,SIZE*SIZE);
+  m = new compressed_matrix<double>(SIZE,SIZE,SIZE*SIZE);
   for (int i = 0; i < SIZE; i++) {
     for (int j = 0; j < SIZE; j++) {
-      (*m1)(i,j) = i * SIZE + j;
+      if (i == j)
+        (*m)(i,j) = SIZE;
+      else
+        (*m)(i,j) = 1;
+      // (*m)(i,j) = (i * SIZE + j + 1);
     }
   }
 
-  m2 = new compressed_matrix<double>(SIZE,SIZE,SIZE*SIZE);
-  for (int i = 0; i < SIZE; i++) {
-    for (int j = 0; j < SIZE; j++) {
-      (*m2)(i,j) = i * SIZE + j + SIZE * SIZE;
-    }
-  }
+  vector<double> *v;
 
-  // std::cout << *m1 << std::endl;
-  // std::cout << *m2 << std::endl;
-  // std::cout << prod(*m1,*m2) << std::endl;
+  v = new vector<double>(SIZE);
+
+  for (int i = 0; i < SIZE; i++)
+    (*v)(i) = i;
+
+  std::cout << "Making gridsolver." << std::endl;
+
+  GridSolver solver(m,v);
+
+  vector<double> *guess = new vector<double>(SIZE);
+
+  for (int i = 0; i < SIZE; i++)
+    (*guess)(i) = 1;
+
+  std::cout << "Stepping once." << std::endl;
+
+  solver.solve(guess, 1);
+
+  std::cout << *guess << std::endl;
 }

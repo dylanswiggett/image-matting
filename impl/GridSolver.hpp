@@ -15,13 +15,15 @@ class GridSolver {
 
   // Approximately solves from guess down to some threshold residual.
   // The approximate solution is stored directly back into guess.
-  virtual void solve(const vector<double>* guess, double threshold);
+  virtual void solve(vector<double>* guess, double threshold);
  private:
+  void step(vector<double>* guess);
+
   const compressed_matrix<double> *a_mat_;
   const vector<double> *sol_;
 
   // Gauss-Seidel matrices
-  const compressed_matrix<double> *p_mat_, *g_mat_;
+  // compressed_matrix<double> p_mat_, g_mat_;
 };
 
 #endif  // _GRID_SOLVER_HPP_
