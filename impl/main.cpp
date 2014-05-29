@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
   v = new SparseMatrix<double>(SIZE,1);
 
   for (int i = 0; i < SIZE; i++)
-    (*v).insert(i,0) = i;
+    (*v).insert(i,0) = 0;
 
   std::cout << "Making gridsolver." << std::endl;
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
   for (int i = 0; i < SIZE; i++)
     (*guess).insert(i,0) = 1000;
 
-  std::cout << *(GridSampler(guess).downsample()) << std::endl;
+  std::cout << *(GridSampler(guess).upsample(SIZE * 2 - 1, 1)) << std::endl;
 
   std::cout << "Stepping once." << std::endl;
 

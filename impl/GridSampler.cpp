@@ -6,7 +6,7 @@
 using namespace Eigen;
 
 SparseMatrix<double>* GridSampler::upsample(int newWidth, int newHeight) {
-  SparseMatrix<double> *newMat = new SparseMatrix<double>(mat_->rows() * 2, mat_->cols() * 2);
+  SparseMatrix<double> *newMat = new SparseMatrix<double>(newWidth, newHeight);
 
   for (int k = 0; k < mat_->outerSize(); ++k){
     for (Eigen::SparseMatrix<double>::InnerIterator it(*mat_, k); it; ++it){
@@ -20,8 +20,8 @@ SparseMatrix<double>* GridSampler::upsample(int newWidth, int newHeight) {
 SparseMatrix<double>* GridSampler::downsample() {
   int num_rows = mat_->rows() / 2;
   int num_cols = mat_->cols() / 2;
-  if (num_rows == 0) num_rows = 1;
-  if (num_cols == 0) num_cols = 1;
+  if (mat_->rows() % 2 == 1) num_rows++;
+  if (mat_->cols() % 2 == 1) num_cols++;
   SparseMatrix<double> *newMat = new SparseMatrix<double>(num_rows, num_cols);
 
   for (int k = 0; k < mat_->outerSize(); ++k){
@@ -96,5 +96,6 @@ void GridSampler::downsampleIndex(const SparseMatrix<double>* src, SparseMatrix<
   if (sampleValidIndex(i,j1, src, &result2)) scale_factor += .125;
 
   if (sampleValidIndex(i,j, src, &result3)) scale_factor += .25;
+
   dest->coeffRef(i / 2,j / 2) = (result1 * .0625 + result2 * .125 + result3 * .25) / scale_factor;
 }
