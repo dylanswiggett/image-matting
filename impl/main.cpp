@@ -6,7 +6,7 @@
 
 using namespace Eigen;
 
-#define SIZE 10
+#define SIZE 100
 
 int main(int argc, char** argv) {
   SparseMatrix<double> *m;
@@ -14,7 +14,6 @@ int main(int argc, char** argv) {
   m = new SparseMatrix<double>(SIZE,SIZE);
   m->reserve(SIZE*1000);
   for (int i = 0; i < SIZE; i++) {
-    std::cout << i << std::endl;
     for (int j = 0; j < SIZE; j++) {
       if (i == j)
         m->insert(j,i) = 2;
@@ -24,31 +23,27 @@ int main(int argc, char** argv) {
   }
   m->makeCompressed();
 
-  std::cout << *m << std::endl;
+  // std::cout << "'A' Matrix:\n--------------------------------\n" << *m << "\n--------------------------------" << std::endl;
 
-  SparseMatrix<double> *v;
+  SparseMatrix<double> *expected;
 
-  v = new SparseMatrix<double>(SIZE,1);
+  expected = new SparseMatrix<double>(SIZE,1);
 
   for (int i = 0; i < SIZE; i++)
-    (*v).insert(i,0) = 0;
+    (*expected).insert(i,0) = 0;
 
-  std::cout << "Making gridsolver." << std::endl;
-
-  GridSolver solver(m,v);
+  GridSolver solver(m,expected);
 
   SparseMatrix<double> *guess = new SparseMatrix<double>(SIZE,1);
 
   for (int i = 0; i < SIZE; i++)
     (*guess).insert(i,0) = 1000;
 
-  std::cout << *(GridSampler(guess).upsample(SIZE * 2 - 1, 1)) << std::endl;
-
-  std::cout << "Stepping once." << std::endl;
+  std::cout << "Stepping once... ";
 
   solver.solve(guess, 1);
 
-  std::cout << "Done!" << std::endl;
+  std::cout << "Done!\nexpected has error of:" << std::endl;
 
-  std::cout << (*m) * (*guess) << std::endl;
+  std::cout << (*m) * (*guess) - *expected << std::endl;
 }

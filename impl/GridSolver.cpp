@@ -17,10 +17,16 @@ void GridSolver::solve(SparseMatrix<double>* guess, double threshold) {
   if (guess->size() != sol_->size())
       throw "Guess wrong size.";
 
-
+  // V-CYCLE
   if (threshold > .01 && guess->rows() > 1) {
     // Relax on Au=f
-    step(guess);
+    int num_iters = 1000 / guess->rows();
+    if (num_iters == 0) num_iters = 1;
+    for (int i = 0; i < num_iters; i++)
+      step(guess);
+
+    // std::cout << "INITIAL GUESS WITH THRESH " << threshold << std::endl;
+    // std::cout << *guess << std::endl;
 
     // r <- f - Au
     SparseMatrix<double> residue = *sol_ - *a_mat_ * (*guess);
@@ -39,11 +45,22 @@ void GridSolver::solve(SparseMatrix<double>* guess, double threshold) {
     delete small_a_mat;
     delete small_residue;
 
+    // std::cout << "FINAL SMALL_ERROR GUESS: " << std::endl;
+    // std::cout << *small_guess << std::endl;
+
     // u <- u + e^{h}
-    *guess += *GridSampler(small_guess).upsample(guess->rows(), 1);
+    SparseMatrix<double> *error_guess = GridSampler(small_guess).upsample(guess->rows(), 1);
+
+    // std::cout << "FINAL ERROR GUESS: " << std::endl;
+    // std::cout << *error_guess << std::endl;
+    *guess += *error_guess;
+
+    // std::cout << "FINAL GUESS WITH THRESH " << threshold << std::endl;
+    // std::cout << *guess << std::endl;
 
     // Relax on Au=f
-    step(guess);
+    for (int i = 0; i < num_iters; i++)
+      step(guess);
 
   }
 }
