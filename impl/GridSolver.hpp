@@ -1,26 +1,25 @@
 #ifndef _GRID_SOLVER_HPP_
 #define _GRID_SOLVER_HPP_
 
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/vector.hpp>
+#include <eigen3/Eigen/Sparse>
 
-using namespace boost::numeric::ublas;
+using namespace Eigen;
 
 // An interative linear system solver that produces solutions of the form A*u=f
 class GridSolver {
  public:
   // Constructs a new grid solver, and performs all heavy calculations necessary
   // for iteration to begin.
-  GridSolver(const compressed_matrix<double>* aMatrix, const vector<double>* solution);
+  GridSolver(const SparseMatrix<double> *aMatrix, const SparseVector<double>* solution);
 
   // Approximately solves from guess down to some threshold residual.
   // The approximate solution is stored directly back into guess.
-  virtual void solve(vector<double>* guess, double threshold);
+  virtual void solve(SparseVector<double>* guess, double threshold);
  private:
-  void step(vector<double>* guess);
+  void step(SparseVector<double>* guess);
 
-  const compressed_matrix<double> *a_mat_;
-  const vector<double> *sol_;
+  const SparseMatrix<double> *a_mat_;
+  const SparseVector<double> *sol_;
 
   // Gauss-Seidel matrices
   // compressed_matrix<double> p_mat_, g_mat_;

@@ -1,31 +1,25 @@
 #include "./GridSolver.hpp"
 
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/matrix_proxy.hpp>
-#include <boost/numeric/ublas/vector.hpp>
-#include <boost/numeric/ublas/vector_proxy.hpp>
-#include <boost/numeric/ublas/triangular.hpp>
-#include <boost/numeric/ublas/lu.hpp>
-#include <boost/numeric/ublas/io.hpp>
+#include <eigen3/Eigen/Sparse>
 
 #include <iostream>
 
-using namespace boost::numeric::ublas;
+using namespace Eigen;
 
-GridSolver::GridSolver(const compressed_matrix<double>* aMatrix, const vector<double>* solution) :
+GridSolver::GridSolver(const SparseMatrix<double> *aMatrix, const SparseVector<double>* solution) :
   a_mat_(aMatrix), sol_(solution)
 {
   // TODO: Check that the matrix and solution have the same dimension. Give appropriate error if not.
 }
 
-void GridSolver::solve(vector<double>* guess, double threshold) {
+void GridSolver::solve(SparseVector<double>* guess, double threshold) {
   if (guess->size() != sol_->size())
     throw "Guess wrong size.";
   for (int i = 0; i < 10; i++)
     step(guess);
 }
 
-void GridSolver::step(vector<double>* guess) {
+void GridSolver::step(SparseVector<double>* guess) {
   // We use forward substitution to avoid taking inverses.
   // See http://en.wikipedia.org/wiki/Gauss–Seidel_method
   for (size_t i = 0; i < sol_->size(); i++) {

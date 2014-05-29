@@ -1,47 +1,45 @@
 #include <iostream>
 #include "GridSolver.hpp"
 
-#include <boost/numeric/ublas/io.hpp>
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/vector.hpp>
+#include <eigen3/Eigen/Sparse>
 
-using namespace boost::numeric::ublas;
+using namespace Eigen;
 
 #define SIZE 1024
 
 int main(int argc, char** argv) {
-  compressed_matrix<double> *m;
+  SparseMatrix<double> *m;
 
-  m = new compressed_matrix<double>(SIZE,SIZE,SIZE*SIZE);
+  m = new SparseMatrix<double>(SIZE,SIZE);
   for (int i = 0; i < SIZE; i++) {
     for (int j = 0; j < SIZE; j++) {
       if (i == j)
-        (*m)(i,j) = SIZE;
+        (*m).insert(i,j) = SIZE;
       else
-        (*m)(i,j) = 1;
+        (*m).insert(i,j) = 1;
       // (*m)(i,j) = (i * SIZE + j + 1);
     }
   }
 
-  vector<double> *v;
+  SparseVector<double> *v;
 
-  v = new vector<double>(SIZE);
+  v = new SparseVector<double>(SIZE);
 
   for (int i = 0; i < SIZE; i++)
-    (*v)(i) = 0;
+    (*v).insert(i) = 0;
 
   std::cout << "Making gridsolver." << std::endl;
 
   GridSolver solver(m,v);
 
-  vector<double> *guess = new vector<double>(SIZE);
+  SparseVector<double> *guess = new SparseVector<double>(SIZE);
 
   for (int i = 0; i < SIZE; i++)
-    (*guess)(i) = 1000;
+    (*guess).insert(i) = 1000;
 
   std::cout << "Stepping once." << std::endl;
 
   solver.solve(guess, 1);
 
-  std::cout << prod((*m), (*guess)) << std::endl;
+  std::cout << (*m) * (*guess) << std::endl;
 }
