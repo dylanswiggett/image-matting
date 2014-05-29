@@ -18,21 +18,28 @@ void GridSolver::solve(SparseMatrix<double>* guess, double threshold) {
       throw "Guess wrong size.";
 
   // V-CYCLE
+  
+  // Relax on Au=f
+  // int num_iters = 1000 / guess->rows();
+  // if (num_iters == 0) num_iters = 1;
+  int num_iters = 1;
+  for (int i = 0; i < num_iters; i++)
+    relax(guess);
+
+  // std::cout << "INITIAL GUESS WITH THRESH " << threshold << std::endl;
+  // std::cout << *guess << std::endl;
+
   if (threshold > .01 && guess->rows() > 1) {
-    // Relax on Au=f
-    int num_iters = 1000 / guess->rows();
-    if (num_iters == 0) num_iters = 1;
-    for (int i = 0; i < num_iters; i++)
-      step(guess);
-
-    // std::cout << "INITIAL GUESS WITH THRESH " << threshold << std::endl;
-    // std::cout << *guess << std::endl;
-
     // r <- f - Au
     SparseMatrix<double> residue = *sol_ - *a_mat_ * (*guess);
 
     SparseMatrix<double> *small_a_mat = GridSampler(a_mat_).downsample();
     SparseMatrix<double> *small_residue = GridSampler(&residue).downsample();
+
+    std::cout << "A_MATRIX:\n----------------------\n" << *a_mat_ << "\n----------------------\n" << std::endl;
+    std::cout << "RESIDUE:\n----------------------\n" << residue << "\n----------------------\n" << std::endl;
+    std::cout << "SMALL A_MATRIX:\n----------------------\n" << *small_a_mat << "\n----------------------\n" << std::endl;
+    std::cout << "SMALL RESIDUE:\n----------------------\n" << *small_residue << "\n----------------------\n" << std::endl;
 
     // e^{2h} = 0
     int downsample_size = small_a_mat->rows();
@@ -45,27 +52,28 @@ void GridSolver::solve(SparseMatrix<double>* guess, double threshold) {
     delete small_a_mat;
     delete small_residue;
 
-    // std::cout << "FINAL SMALL_ERROR GUESS: " << std::endl;
-    // std::cout << *small_guess << std::endl;
+    std::cout << "FINAL SMALL_ERROR GUESS: " << std::endl;
+    std::cout << *small_guess << std::endl;
 
     // u <- u + e^{h}
     SparseMatrix<double> *error_guess = GridSampler(small_guess).upsample(guess->rows(), 1);
+    delete small_guess;
 
-    // std::cout << "FINAL ERROR GUESS: " << std::endl;
-    // std::cout << *error_guess << std::endl;
+    std::cout << "FINAL ERROR GUESS: " << std::endl;
+    std::cout << *error_guess << std::endl;
     *guess += *error_guess;
+    delete error_guess;
 
-    // std::cout << "FINAL GUESS WITH THRESH " << threshold << std::endl;
-    // std::cout << *guess << std::endl;
-
-    // Relax on Au=f
-    for (int i = 0; i < num_iters; i++)
-      step(guess);
-
+    std::cout << "FINAL GUESS WITH THRESH " << threshold << std::endl;
+    std::cout << *guess << std::endl;
   }
+
+  // Relax on Au=f
+  for (int i = 0; i < num_iters; i++)
+    relax(guess);
 }
 
-void GridSolver::step(SparseMatrix<double>* guess) {
+void GridSolver::relax(SparseMatrix<double>* guess) {
   // We use forward substitution to avoid taking inverses.
   // See http://en.wikipedia.org/wiki/Gauss–Seidel_method
   for (int i = 0; i < a_mat_->rows(); i++) {

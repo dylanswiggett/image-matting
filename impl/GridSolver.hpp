@@ -16,7 +16,7 @@ class GridSolver {
   // The approximate solution is stored directly back into guess.
   virtual void solve(SparseMatrix<double>* guess, double threshold);
  private:
-  void step(SparseMatrix<double>* guess);
+  void relax(SparseMatrix<double>* guess);
 
   const SparseMatrix<double> *a_mat_;
   const SparseMatrix<double> *sol_;

@@ -6,13 +6,13 @@
 
 using namespace Eigen;
 
-#define SIZE 100
+#define SIZE 2
 
 int main(int argc, char** argv) {
   SparseMatrix<double> *m;
 
   m = new SparseMatrix<double>(SIZE,SIZE);
-  m->reserve(SIZE*1000);
+  m->reserve(SIZE*3);
   for (int i = 0; i < SIZE; i++) {
     for (int j = 0; j < SIZE; j++) {
       if (i == j)
@@ -46,4 +46,8 @@ int main(int argc, char** argv) {
   std::cout << "Done!\nexpected has error of:" << std::endl;
 
   std::cout << (*m) * (*guess) - *expected << std::endl;
+
+  delete m;
+  delete expected;
+  delete guess;
 }
