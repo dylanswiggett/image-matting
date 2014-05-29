@@ -1,10 +1,11 @@
 #include "./GridSampler.hpp"
 
 #include <eigen3/Eigen/Sparse>
+#include <iostream>
 
 using namespace Eigen;
 
-SparseMatrix<double>* GridSampler::upsample() {
+SparseMatrix<double>* GridSampler::upsample(int newWidth, int newHeight) {
   SparseMatrix<double> *newMat = new SparseMatrix<double>(mat_->rows() * 2, mat_->cols() * 2);
 
   for (int k = 0; k < mat_->outerSize(); ++k){
@@ -17,7 +18,11 @@ SparseMatrix<double>* GridSampler::upsample() {
 }
 
 SparseMatrix<double>* GridSampler::downsample() {
-  SparseMatrix<double> *newMat = new SparseMatrix<double>(mat_->rows() / 2, mat_->cols() / 2);
+  int num_rows = mat_->rows() / 2;
+  int num_cols = mat_->cols() / 2;
+  if (num_rows == 0) num_rows = 1;
+  if (num_cols == 0) num_cols = 1;
+  SparseMatrix<double> *newMat = new SparseMatrix<double>(num_rows, num_cols);
 
   for (int k = 0; k < mat_->outerSize(); ++k){
     for (Eigen::SparseMatrix<double>::InnerIterator it(*mat_, k); it; ++it){
@@ -28,53 +33,43 @@ SparseMatrix<double>* GridSampler::downsample() {
   return newMat;
 }
 
-// void toValidIndex(int& i, int&j, const SparseMatrix<double>* mat) {
-//   if (i < 0)
-//     i = 0;
-//   else if (i >= mat->rows())
-//     i = mat->rows() - 1;
-//   if (j < 0)
-//     j = 0;
-//   else if (j >= mat->rows())
-//     j = mat->rows() - 1;
-// }
+bool sampleValidIndex(int& i, int& j, const SparseMatrix<double>* mat, double *result) {
+  if (i >= 0 && i < mat->rows() && j >= 0 && j < mat->cols()) {
+    *result += mat->coeff(i,j);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void incrValidIndex(SparseMatrix<double>* mat, int i, int j, double amt) {
+  if (i >= 0 && i < mat->rows() && j >= 0 && j < mat->cols())
+    mat->coeffRef(i,j) += amt;
+}
 
 void GridSampler::upsampleIndex(const SparseMatrix<double>* src, SparseMatrix<double>* dest, int iMid, int jMid) {
-  // for (int iDiff = -1; iDiff <= 1; ++iDiff) {
-  //   for (int jDiff = -1; jDiff <= 1; ++jDiff) {
-  //     int i = iMid * 2 + iDiff;
-  //     int j = jMid * 2 + jDiff;
-  //     int i0 = i - 1;
-  //     int i1 = i + 1;
-  //     int j0 = j - 1;
-  //     int j1 = j + 1;
-  //     toValidIndex(i0,j0, src);
-  //     toValidIndex(i1,j1, src);
-  //     toValidIndex(i,j, src);
-
-  //     double result = 0;
-  //     result += (src->coeff(i0,j0) + src->coeff(i1,j0) + src->coeff(i1,j1) + src->coeff(i0,j1)) * .25;
-  //     result += (src->coeff(i0, j) + src->coeff(i1, j) + src->coeff( i,j0) + src->coeff( i,j1)) * .5;
-  //     result += src->coeff(i,j);
-  //     dest->coeffRef(i,j) = result;
-  //   }
-  // }
   int i = iMid * 2;
   int j = jMid * 2;
   int i0 = i - 1;
   int i1 = i + 1;
   int j0 = j - 1;
   int j1 = j + 1;
-  toValidIndex(i0,j0, dest);
-  toValidIndex(i1,j1, dest);
 
   double full = src->coeff(iMid, jMid);
   double half = full * .5;
   double quarter = half * .5;
 
-  dest->coeffRef(i, j) += full;
-  dest->coeffRef(i0, j0) += quarter; dest->coeffRef(i0, j1) += quarter; dest->coeffRef(i1, j1) += quarter; dest->coeffRef(i1, j0) += quarter;
-  dest->coeffRef(i0, j) += half; dest->coeffRef(i, j0) += half; dest->coeffRef(i1, j) += half; dest->coeffRef(i, j1) += half; 
+  incrValidIndex(dest, i, j, full);
+
+  incrValidIndex(dest, i0, j0, quarter);
+  incrValidIndex(dest, i0, j1, quarter);
+  incrValidIndex(dest, i1, j1, quarter);
+  incrValidIndex(dest, i1, j0, quarter);
+
+  incrValidIndex(dest, i0, j, half);
+  incrValidIndex(dest, i, j0, half);
+  incrValidIndex(dest, i1, j, half);
+  incrValidIndex(dest, i, j1, half); 
 }
 
 void GridSampler::downsampleIndex(const SparseMatrix<double>* src, SparseMatrix<double>* dest, int i, int j) {
@@ -84,12 +79,22 @@ void GridSampler::downsampleIndex(const SparseMatrix<double>* src, SparseMatrix<
   int i1 = i + 1;
   int j0 = j - 1;
   int j1 = j + 1;
-  toValidIndex(i0,j0, src);
-  toValidIndex(i1,j1, src);
 
-  double result = 0;
-  result += (src->coeff(i0,j0) + src->coeff(i1,j0) + src->coeff(i1,j1) + src->coeff(i0,j1)) * .0625;
-  result += (src->coeff(i0, j) + src->coeff(i1, j) + src->coeff( i,j0) + src->coeff( i,j1)) * .125;
-  result += src->coeff(i,j) * .25;
-  dest->coeffRef(i / 2,j / 2) = result;
+  double result1 = 0;
+  double result2 = 0;
+  double result3 = 0;
+  double scale_factor = 0;
+
+  if (sampleValidIndex(i0,j0, src, &result1)) scale_factor += .0625;
+  if (sampleValidIndex(i1,j0, src, &result1)) scale_factor += .0625;
+  if (sampleValidIndex(i1,j1, src, &result1)) scale_factor += .0625;
+  if (sampleValidIndex(i0,j1, src, &result1)) scale_factor += .0625;
+
+  if (sampleValidIndex(i0,j, src, &result2)) scale_factor += .125;
+  if (sampleValidIndex(i1,j, src, &result2)) scale_factor += .125;
+  if (sampleValidIndex(i,j0, src, &result2)) scale_factor += .125;
+  if (sampleValidIndex(i,j1, src, &result2)) scale_factor += .125;
+
+  if (sampleValidIndex(i,j, src, &result3)) scale_factor += .25;
+  dest->coeffRef(i / 2,j / 2) = (result1 * .0625 + result2 * .125 + result3 * .25) / scale_factor;
 }

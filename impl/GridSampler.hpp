@@ -8,7 +8,7 @@ using namespace Eigen;
 class GridSampler {
  public:
   GridSampler(const SparseMatrix<double>* mat) : mat_(mat) {};
-  SparseMatrix<double>* upsample();
+  SparseMatrix<double>* upsample(int newWidth, int newHeight);
   SparseMatrix<double>* downsample();
  private:
   void upsampleIndex(const SparseMatrix<double>* src, SparseMatrix<double>* dest, int i, int j);

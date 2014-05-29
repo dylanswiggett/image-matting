@@ -26,23 +26,23 @@ int main(int argc, char** argv) {
 
   std::cout << *m << std::endl;
 
-  std::cout << *(GridSampler(m).downsample()) << std::endl;
+  SparseMatrix<double> *v;
 
-  SparseVector<double> *v;
-
-  v = new SparseVector<double>(SIZE);
+  v = new SparseMatrix<double>(SIZE,1);
 
   for (int i = 0; i < SIZE; i++)
-    (*v).insert(i) = i;
+    (*v).insert(i,0) = i;
 
   std::cout << "Making gridsolver." << std::endl;
 
   GridSolver solver(m,v);
 
-  SparseVector<double> *guess = new SparseVector<double>(SIZE);
+  SparseMatrix<double> *guess = new SparseMatrix<double>(SIZE,1);
 
   for (int i = 0; i < SIZE; i++)
-    (*guess).insert(i) = 1000;
+    (*guess).insert(i,0) = 1000;
+
+  std::cout << *(GridSampler(guess).downsample()) << std::endl;
 
   std::cout << "Stepping once." << std::endl;
 
