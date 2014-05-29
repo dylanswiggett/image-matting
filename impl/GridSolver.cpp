@@ -15,20 +15,18 @@ GridSolver::GridSolver(const SparseMatrix<double> *aMatrix, const SparseVector<d
 void GridSolver::solve(SparseVector<double>* guess, double threshold) {
   if (guess->size() != sol_->size())
     throw "Guess wrong size.";
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < 1; i++)
     step(guess);
 }
 
 void GridSolver::step(SparseVector<double>* guess) {
   // We use forward substitution to avoid taking inverses.
   // See http://en.wikipedia.org/wiki/Gauss–Seidel_method
-  for (size_t i = 0; i < sol_->size(); i++) {
-    double sum = (*sol_)(i);
-    for (size_t j = 0; j < guess->size(); j++) {
-      if (j != i)
-        sum -= (*a_mat_)(i,j) * (*guess)(j);
-    }
-    // sum -= (prod(matrix_row<matrix<double>>(*a_mat_,i),*guess))(0,0);
-    (*guess)(i) = (1/(*a_mat_)(i,i)) * sum;
+  for (int i = 0; i < a_mat_->rows(); i++) {
+    SparseMatrix<double> result_sum =
+      a_mat_->block(0, i, a_mat_->rows(), 1).transpose() * (*guess);
+    double sum = sol_->coeff(i) - result_sum.coeff(0,0)
+               + a_mat_->coeff(i,i) * guess->coeff(i);
+    guess->coeffRef(i) = sum / a_mat_->coeff(i,i);
   }
 }

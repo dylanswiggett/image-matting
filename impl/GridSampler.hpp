@@ -1,18 +1,19 @@
 #ifndef _GRID_SAMPLER_HPP_
 #define _GRID_SAMPLER_HPP_
 
-#include <boost/numeric/ublas/matrix_sparse.hpp>
-#include <boost/numeric/ublas/vector.hpp>
+#include <eigen3/Eigen/Sparse>
 
-using namespace boost::numeric::ublas;
+using namespace Eigen;
 
 class GridSampler {
  public:
-  GridSampler(const compressed_matrix<double>* mat) : mat_(mat) {};
-  compressed_matrix<double>* upsample();
-  compressed_matrix<double>* downsample();
+  GridSampler(const SparseMatrix<double>* mat) : mat_(mat) {};
+  SparseMatrix<double>* upsample();
+  SparseMatrix<double>* downsample();
  private:
-  const compressed_matrix<double>* mat_;
+  void upsampleIndex(const SparseMatrix<double>* src, SparseMatrix<double>* dest, int i, int j);
+  void downsampleIndex(const SparseMatrix<double>* src, SparseMatrix<double>* dest, int i, int j);
+  const SparseMatrix<double>* mat_;
 };
 
 #endif  // _GRID_SAMPLER_HPP_
