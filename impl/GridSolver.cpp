@@ -1,6 +1,7 @@
 #include "./GridSolver.hpp"
 
 #include <boost/numeric/ublas/matrix_sparse.hpp>
+#include <boost/numeric/ublas/matrix_proxy.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/vector_proxy.hpp>
 #include <boost/numeric/ublas/triangular.hpp>
@@ -33,6 +34,7 @@ void GridSolver::step(vector<double>* guess) {
       if (j != i)
         sum -= (*a_mat_)(i,j) * (*guess)(j);
     }
+    // sum -= (prod(matrix_row<matrix<double>>(*a_mat_,i),*guess))(0,0);
     (*guess)(i) = (1/(*a_mat_)(i,i)) * sum;
   }
 }

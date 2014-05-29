@@ -7,7 +7,7 @@
 
 using namespace boost::numeric::ublas;
 
-#define SIZE 1000
+#define SIZE 1024
 
 int main(int argc, char** argv) {
   compressed_matrix<double> *m;
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
   v = new vector<double>(SIZE);
 
   for (int i = 0; i < SIZE; i++)
-    (*v)(i) = i;
+    (*v)(i) = 0;
 
   std::cout << "Making gridsolver." << std::endl;
 
@@ -37,11 +37,11 @@ int main(int argc, char** argv) {
   vector<double> *guess = new vector<double>(SIZE);
 
   for (int i = 0; i < SIZE; i++)
-    (*guess)(i) = 1;
+    (*guess)(i) = 1000;
 
   std::cout << "Stepping once." << std::endl;
 
   solver.solve(guess, 1);
 
-  std::cout << *guess << std::endl;
+  std::cout << prod((*m), (*guess)) << std::endl;
 }
