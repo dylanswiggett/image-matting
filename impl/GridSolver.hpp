@@ -10,16 +10,16 @@ class GridSolver {
  public:
   // Constructs a new grid solver, and performs all heavy calculations necessary
   // for iteration to begin.
-  GridSolver(const SparseMatrix<double> *aMatrix, const SparseMatrix<double>* solution);
+  GridSolver(const SparseMatrix<double,RowMajor> *aMatrix, const SparseMatrix<double,RowMajor>* solution);
 
   // Approximately solves from guess down to some threshold residual.
   // The approximate solution is stored directly back into guess.
-  virtual void solve(SparseMatrix<double>* guess, double threshold);
+  virtual void solve(SparseMatrix<double,RowMajor>* guess, double threshold);
  private:
-  void relax(SparseMatrix<double>* guess);
+  void relax(SparseMatrix<double,RowMajor>* guess);
 
-  const SparseMatrix<double> *a_mat_;
-  const SparseMatrix<double> *sol_;
+  const SparseMatrix<double,RowMajor> *a_mat_;
+  const SparseMatrix<double,RowMajor> *sol_;
 
   // Gauss-Seidel matrices
   // compressed_matrix<double> p_mat_, g_mat_;
