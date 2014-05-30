@@ -1,5 +1,5 @@
 \subsection{Image Matting}
-Image matting is an extensive field, but in this paper I focus on foreground and background extraction. Given an image $I$, we wish to produce a matte (an $\alpha$ value at each pixel, $\alpha_{i}\in[0,1]$) such that at each pixel $i$ we can deconstruct the color value $I_{i}$ into a sum of samples from a foreground color $F_{i}$ and a background color $B_{i}$. To produce the color value in our original image, we then take
+Image matting is an extensive field, but in this paper I focus on foreground and background extraction. Given an image $I$, we wish to produce a \textbf{matte} (a trasparency value $\alpha$ at each pixel, $\alpha_{i}\in[0,1]$) such that at each pixel $i$ we can deconstruct the color value $I_{i}$ into a sum of samples from a foreground color $F_{i}$ and a background color $B_{i}$. To produce the color value in our original image, we then take
 \[I_{i}=\alpha_{i}F_{i}+(1-\alpha_{i})B_{i}\]
 In practical use, a user kicks off this extraction by sketching regions of the image that are known to be foreground or known to be background, so that different regions of the image can be reliably extracted. This is an important, but difficult algorithmic problem in image processing. Direct solving is typically infeasible, so many approximate solutions have been attempted.
 \subsection{Topics Covered}
