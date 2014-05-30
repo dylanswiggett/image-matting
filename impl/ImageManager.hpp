@@ -20,6 +20,7 @@ class ImageManager {
 
  private:
   double LaplaciantAt(int x1, int y1, int x2, int y2);
+  double GetIntensity(int x, int y);
   int GetPixel(int x, int y);
 
   SDL_Surface *image;
