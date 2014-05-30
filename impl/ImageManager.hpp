@@ -19,6 +19,7 @@ class ImageManager {
   void SaveTo(std::string path);
 
  private:
+  double LaplaciantAt(int x1, int y1, int x2, int y2);
   int GetPixel(int x, int y);
 
   SDL_Surface *image;

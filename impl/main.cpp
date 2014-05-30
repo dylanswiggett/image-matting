@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
 
   ImageManager img("test_img/small_2color.bmp");
 
-  std::cout << *(img.GetGreyscaleMatrix()) << std::endl;
+  std::cout << *(img.GetLaplacian()) << std::endl;
 
   // std::cout << *(GridSampler(GridSampler(m).upsample(7,7)).downsample()) << std::endl;
 
