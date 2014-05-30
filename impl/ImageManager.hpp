@@ -24,6 +24,7 @@ class ImageManager {
   int GetPixel(int x, int y);
 
   SDL_Surface *image;
+  SparseMatrix<double,RowMajor> *greyscale_matrix_;
 };
 
 #endif  // IMAGE_MANAGER_HPP_

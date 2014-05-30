@@ -17,8 +17,7 @@ ImageManager::ImageManager(std::string path) {
 }
 
 ImageManager::~ImageManager() {
-  SDL_FreeSurface(image);
-}
+  SDL_FreeSurface(image);}
 
 SparseMatrix<double,RowMajor>* ImageManager::GetLaplacian() {
   SparseMatrix<double,RowMajor> *L = new SparseMatrix<double,RowMajor>(image->w * image->h, image->w * image->h);
@@ -28,8 +27,8 @@ SparseMatrix<double,RowMajor>* ImageManager::GetLaplacian() {
       for (int x2 = 0; x2 < image->h; ++x2) {
         for (int y2 = 0; y2 < image->h; ++y2) {
           double Lval = LaplaciantAt(x1, y1, x2, y2);
-          if (abs(Lval) > .001)
-            L->insert(x1 * image->w + y1, x2 * image->w + y2) = Lval;
+          // if (abs(Lval) > .001)
+            L->insert(x1 * image->h + y1, x2 * image->h + y2) = Lval;
         }
       }
     }
@@ -111,16 +110,11 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
       mean /= W_K;
       variance = variance / W_K - mean * mean;
 
-      std::cout << mean << std::endl;
-      std::cout << variance << std::endl;
-
       double kronecker = (x1 == x2 && y1 == y2) ? 1 : 0;
 
       double value = (1.0 / W_K) *
                      (1.0 + 1.0 / (EPSILON/W_K + variance) *
                                 (I1 - mean) * (I2 - mean));
-
-      std::cout << kronecker << " - " << value << std::endl;
 
       q += kronecker - value;
     }
