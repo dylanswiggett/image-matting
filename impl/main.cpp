@@ -27,12 +27,20 @@ int main(int argc, char** argv) {
   // }
   // m->makeCompressed();
 
-  ImageManager img("test_img/small_2color.bmp");
-  ImageManager img_guess("test_img/small_2color_guess.bmp");
+  ImageManager img("test_img/lock.bmp");
+  ImageManager img_guess("test_img/lock_guess.bmp");
+
+  ImageManager(img.GetLaplacian()).SaveTo("test_img/lock_laplacian.bmp");
 
   FGBGMatte matte(&img, &img_guess);
 
-  std::cout << *(matte.GetMatte()) << std::endl;
+  ImageManager matte_img(matte.GetMatte());
+
+  matte_img.SaveTo("test_img/lock_result.bmp");
+  // ImageManager(img.GetGreyscaleMatrix()).SaveTo("test_img/small_2color_resave.bmp");
+  // ImageManager(img_guess.GetGreyscaleMatrix()).SaveTo("test_img/small_2color_guess_resave.bmp");
+
+  // std::cout << *(matte.GetMatte()) << std::endl;
 
   // std::cout << *(img.GetLaplacian()) << std::endl;
 

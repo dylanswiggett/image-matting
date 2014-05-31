@@ -10,6 +10,7 @@ using namespace Eigen;
 class ImageManager {
  public:
   ImageManager(std::string path);
+  ImageManager(SparseMatrix<double,RowMajor>* basis);
   ~ImageManager();
 
   SparseMatrix<double,RowMajor>* GetLaplacian();
@@ -18,13 +19,15 @@ class ImageManager {
 
   void SaveTo(std::string path);
 
+  int GetW() { return image->w; }
+  int GetH() { return image->h; }
+
  private:
   double LaplaciantAt(int x1, int y1, int x2, int y2);
   double GetIntensity(int x, int y);
   int GetPixel(int x, int y);
 
   SDL_Surface *image;
-  SparseMatrix<double,RowMajor> *greyscale_matrix_;
 };
 
 #endif  // IMAGE_MANAGER_HPP_
