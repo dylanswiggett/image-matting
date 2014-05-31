@@ -6,7 +6,8 @@
 #include <cmath> 
 
 #define LAPLACIAN_RAD 1
-#define W_K ((double) (2 * LAPLACIAN_RAD + 1) * (2 * LAPLACIAN_RAD + 1))
+#define MAX_LAP_RAD (double)(2 * LAPLACIAN_RAD + 1)
+#define W_K (MAX_LAP_RAD * MAX_LAP_RAD)
 #define EPSILON .01
 
 using namespace Eigen;
@@ -46,11 +47,14 @@ ImageManager::~ImageManager() {
 
 SparseMatrix<double,RowMajor>* ImageManager::GetLaplacian() {
   SparseMatrix<double,RowMajor> *L = new SparseMatrix<double,RowMajor>(image->w * image->h, image->w * image->h);
-  L->reserve(image->w * image->h * image->w * image->h);
+  L->reserve(image->w * image->h * 100);
 
   for (int x1 = 0; x1 < image->w; ++x1) {
+    std::cout << x1 << std::endl;
     for (int y1 = 0; y1 < image->h; ++y1) {
-      for (int x2 = 0; x2 < image->w; ++x2) {
+      int minx = fmax(x1 - MAX_LAP_RAD, 0);
+      int maxx = fmin(x1 + MAX_LAP_RAD + 1, image->w);
+      for (int x2 = minx; x2 < maxx; ++x2) {
         for (int y2 = 0; y2 < image->h; ++y2) {
           double Lval = LaplaciantAt(x1, y1, x2, y2);
           if (Lval != 0)
@@ -122,9 +126,7 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
     y1 = temp;
   }
 
-  int max_dist = 2 * LAPLACIAN_RAD + 1;
-
-  if (x2 - x1 > max_dist || y2 - y1 > max_dist)
+  if (x2 - x1 > MAX_LAP_RAD || y2 - y1 > MAX_LAP_RAD)
     return 0;
   // return 1;
 
@@ -134,29 +136,6 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
   double kronecker = (x1 == x2 && y1 == y2) ? 1 : 0;
 
   double q = 0;
-
-  // double wk = 0;
-  // double mean = 0;
-  // double variance = 0;
-  // // A single window (centered at pixel k) that contains both pixels i and j
-  // for (int x = x1; x <= x2; ++x) {
-  //   for (int y = y1; y <= y2; ++y) {
-  //     if (x >= 0 && y >= 0 && x < image->w && y < image->h) {
-  //       double intensity = GetIntensity(x, y);
-  //       mean += intensity;
-  //       variance += intensity * intensity;
-  //       wk++;
-  //     }
-  //   }
-  // }
-
-  // mean /= wk;
-  // variance = variance / wk - mean * mean;
-  // std::cout << wk << std::endl;
-  // double value = (1.0 / wk) *
-  //                (1.0 + (1.0 / (EPSILON/wk + variance)) *
-  //                           (I1 - mean) * (I2 - mean));
-  // q += kronecker - value;
 
   for (int kx = x2 - LAPLACIAN_RAD; kx <= x1 + LAPLACIAN_RAD; ++kx) {
     for (int ky = y2 - LAPLACIAN_RAD; ky <= y1 + LAPLACIAN_RAD; ++ky) {

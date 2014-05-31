@@ -40,7 +40,7 @@ SparseMatrix<double,RowMajor> *FGBGMatte::GetMatte() {
 
   GridSolver solver(&A, &f);
 
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 30; i++) {
     std::cout << "Iter: " << i << ";    Resid. Norm: " << (A * *g).norm() << std::endl;
     solver.solve(g, 0); // For now, I won't use multigrid so
                         // that I can get the matting part working correctly on its own.
