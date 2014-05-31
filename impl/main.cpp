@@ -30,6 +30,8 @@ int main(int argc, char** argv) {
   ImageManager img("test_img/lock.bmp");
   ImageManager img_guess("test_img/lock_guess.bmp");
 
+  // img_guess.SaveTo("test_img/lock_guess_copy.bmp");
+
   ImageManager(img.GetLaplacian()).SaveTo("test_img/lock_laplacian.bmp");
 
   FGBGMatte matte(&img, &img_guess);

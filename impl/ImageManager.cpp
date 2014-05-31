@@ -196,7 +196,7 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
 
 double ImageManager::GetIntensity(int x, int y) {
   // return ((double) GetPixel(x,y)) / 255.0;
-  return ((double) (GetPixel(x,y) & 0x00ff0000 >> 16)) / 255.0;
+  return ((double) ((GetPixel(x,y) & 0x00ff0000) >> 16)) / 255.0;
 }
 
 int ImageManager::GetPixel(int x, int y) {
