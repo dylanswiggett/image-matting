@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <cmath> 
+#include <vector>
 
 #define LAPLACIAN_RAD 1
 #define MAX_LAP_RAD (double)(2 * LAPLACIAN_RAD + 1)
@@ -47,31 +48,59 @@ ImageManager::~ImageManager() {
 
 SparseMatrix<double,RowMajor>* ImageManager::GetLaplacian() {
   SparseMatrix<double,RowMajor> *L = new SparseMatrix<double,RowMajor>(image->w * image->h, image->w * image->h);
-  L->reserve(image->w * image->h * 100);
+  // L->reserve(image->w * image->h * 100);
+
+  std::vector<Triplet<double>> tripletList;
+  tripletList.reserve(image->w * image->h * 100);
+
+  int centerIndex;
 
   for (int x1 = 0; x1 < image->w; ++x1) {
     std::cout << x1 << std::endl;
     for (int y1 = 0; y1 < image->h; ++y1) {
       int minx = fmax(x1 - MAX_LAP_RAD, 0);
       int maxx = fmin(x1 + MAX_LAP_RAD + 1, image->w);
+      double diagonal = 0;
       for (int x2 = minx; x2 < maxx; ++x2) {
         for (int y2 = 0; y2 < image->h; ++y2) {
           double Lval = LaplaciantAt(x1, y1, x2, y2);
-          if (Lval != 0)
-            L->insert(x1 * image->h + y1, x2 * image->h + y2) = Lval;
+          if (x1 == x2 && y1 == y2)
+            centerIndex = tripletList.size();
+          else
+            diagonal += Lval;
+          
+          if (Lval != 0 || (x1 == x2 && y1 == y2)) {
+            tripletList.push_back(Triplet<double>(x1 * image->h + y1, x2 * image->h + y2, Lval));
+          }
         }
       }
-      double diagonal = 0;
-      for (int x2 = 0; x2 < image->w; ++x2) {
-        for (int y2 = 0; y2 < image->h; ++y2) {
-          if (x2 != x1 || y2 != y1)
-            diagonal += L->coeff(x1 * image->h + y1, x2 * image->h + y2);
-        }
-      }
+      // double diagonal = 0;
+      // for (int x2 = 0; x2 < image->w; ++x2) {
+      //   for (int y2 = 0; y2 < image->h; ++y2) {
+      //     if (x2 != x1 || y2 != y1)
+      //       diagonal += L->coeff(x1 * image->h + y1, x2 * image->h + y2);
+      //   }
+      // }
 
-      L->coeffRef(x1 * image->h + y1, x1 * image->h + y1) = -diagonal;
+      tripletList[centerIndex] = Triplet<double>(x1 * image->h + y1, x1 * image->h + y1, -diagonal);
     }
   }
+
+  L->setFromTriplets(tripletList.begin(), tripletList.end());
+
+  // for (int x1 = 0; x1 < image->w; ++x1) {
+  //   std::cout << x1 << std::endl;
+  //   for (int y1 = 0; y1 < image->h; ++y1) {
+  //     double diagonal = 0;
+  //     for (int x2 = 0; x2 < image->w; ++x2) {
+  //       for (int y2 = 0; y2 < image->h; ++y2) {
+  //         if (x2 != x1 || y2 != y1)
+  //           diagonal += L->coeff(x1 * image->h + y1, x2 * image->h + y2);
+  //       }
+  //     }
+  //     L->coeffRef(x1 * image->h + y1, x1 * image->h + y1) = -diagonal;
+  //   }
+  // }
 
   return L;
 }

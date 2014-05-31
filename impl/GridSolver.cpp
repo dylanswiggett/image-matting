@@ -76,11 +76,16 @@ void GridSolver::solve(SparseMatrix<double,RowMajor>* guess, double threshold) {
 void GridSolver::relax(SparseMatrix<double,RowMajor>* guess) {
   // We use forward substitution to avoid taking inverses.
   // See http://en.wikipedia.org/wiki/Gauss–Seidel_method
+  // Eigen::SparseMatrix<double,RowMajor>::InnerIterator sol_it(*sol_, 0);
+  // Eigen::SparseMatrix<double,RowMajor>::InnerIterator guess_it(*guess, 0);
+  std::cout << "Here" << std::endl;
   for (int i = 0; i < a_mat_->rows(); i++) {
     SparseMatrix<double,RowMajor> row = a_mat_->middleRows(i, 1);
     SparseMatrix<double,RowMajor> result = row * (*guess);
+    double a_mat_coeff = a_mat_->coeff(i,i);
     double sum = sol_->coeff(i,0) - result.coeff(0,0)
-               + a_mat_->coeff(i,i) * guess->coeff(i, 0);
-    guess->coeffRef(i, 0) = sum / a_mat_->coeff(i,i);
+               + a_mat_coeff * guess->coeff(i,0);
+    // ++sol_it; ++guess_it;
+    guess->coeffRef(i, 0) = sum / a_mat_coeff;
   }
 }
