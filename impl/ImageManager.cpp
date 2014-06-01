@@ -9,7 +9,7 @@
 #define LAPLACIAN_RAD 1
 #define MAX_LAP_RAD (double)(2 * LAPLACIAN_RAD + 1)
 #define W_K (MAX_LAP_RAD * MAX_LAP_RAD)
-#define EPSILON .01
+#define EPSILON .001
 
 using namespace Eigen;
 
@@ -179,6 +179,9 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
       double value = (1.0 / wk) *
                      (1.0 + (1.0 / (EPSILON/wk + variance)) *
                                 (I1 - mean) * (I2 - mean));
+
+      // if (value == (1.0 / wk))
+      //   std::cout << "ZERO" << std::endl;
 
       q += kronecker - value;
     }

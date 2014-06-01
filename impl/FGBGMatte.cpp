@@ -74,30 +74,34 @@ void FGBGMatte::buildAMatrix(uint level) {
 
   SparseMatrix<double,RowMajor> *guess_mat = guess_->GetGreyscaleMatrix();
 
-  SparseMatrix<double,RowMajor> *f = new SparseMatrix<double,RowMajor>((*image_sizes_)[level]->GetW(), (*image_sizes_)[level]->GetH());
-  SparseMatrix<double,RowMajor> C(L->rows(), L->cols());
+  SparseMatrix<double,RowMajor> *A = new SparseMatrix<double,RowMajor>();
 
-  int dim = pow(2,level);
+  // if (level == 0) {
+    SparseMatrix<double,RowMajor> *f = new SparseMatrix<double,RowMajor>((*image_sizes_)[level]->GetW(), (*image_sizes_)[level]->GetH());
+    SparseMatrix<double,RowMajor> C(L->rows(), L->cols());
 
-  for (int i = 0; i < f->rows(); i++) {
-    for (int j = 0; j < f->cols(); j++) {
-      double guess_val = guess_mat->coeff(i * dim,j * dim);
-      if (guess_val >= 1 || guess_val == 0) {
-        f->insert(i,j) = guess_val;
-        C.insert(i * f->cols() + j, i * f->cols() + j) = 1;
-      } else {
-        f->insert(i,j) = 0;
+    int dim = pow(2,level);
+
+    for (int i = 0; i < f->rows(); i++) {
+      for (int j = 0; j < f->cols(); j++) {
+        double guess_val = guess_mat->coeff(i * dim,j * dim);
+        if (guess_val >= 1 || guess_val == 0) {
+          f->insert(i,j) = guess_val;
+          C.insert(i * f->cols() + j, i * f->cols() + j) = 1;
+        } else {
+          f->insert(i,j) = 0;
+        }
       }
     }
-  }
 
-  (*f) *= GAMMA;
+    (*f) *= GAMMA;
+    (*A) = (*L) + C * GAMMA;
 
-  SparseMatrix<double,RowMajor> *A = new SparseMatrix<double,RowMajor>();
-  (*A) = (*L) + C * GAMMA;
+    f_matrices_->push_back(f);
+  // } else
+  //   (*A) = (*L);
 
   a_matrices_->push_back(A);
-  f_matrices_->push_back(f);
 }
 
 SparseMatrix<double,RowMajor>* matToVec(SparseMatrix<double,RowMajor>* mat, int length) {
@@ -130,7 +134,7 @@ SparseMatrix<double, RowMajor>* FGBGMatte::solve(SparseMatrix<double,RowMajor>* 
   SparseMatrix<double,RowMajor>* a_mat;
 
   // Terminating condition.
-  if (f->rows() == 0 || f->cols() == 0)
+  if (f->rows() == 1 || f->cols() == 1)
     return guess;
 
   // Get our scaled matrices, if necessary.
@@ -168,7 +172,8 @@ SparseMatrix<double, RowMajor>* FGBGMatte::solve(SparseMatrix<double,RowMajor>* 
   delete error_guess;
 
   // Relax on Au=f
-  relax(a_mat, f_vec, final_guess_vec);
+  for (uint i = 0; i <= level; i++)
+    relax(a_mat, f_vec, final_guess_vec);
 
   // Return the guess in image shape again!
   SparseMatrix<double,RowMajor> *final_guess_square = vecToMat(final_guess_vec, guess->rows(), guess->cols());

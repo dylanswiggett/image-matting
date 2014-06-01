@@ -101,7 +101,7 @@ void GridSampler::upsampleIndex(const SparseMatrix<double,RowMajor>* src, Sparse
   if (scale_factor == 0)
     dest->coeffRef(iDest, jDest) = 0;
   else
-    dest->coeffRef(iDest, jDest) = (result1 * .25 + result2 * .5 + result3);// / scale_factor;
+    dest->coeffRef(iDest, jDest) = (result1 * .25 + result2 * .5 + result3) / scale_factor;
 }
 
 void GridSampler::downsampleIndex(const SparseMatrix<double,RowMajor>* src, SparseMatrix<double,RowMajor>* dest, int i, int j) {
