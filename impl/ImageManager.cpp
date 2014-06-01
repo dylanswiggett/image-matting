@@ -44,7 +44,8 @@ ImageManager::ImageManager(SparseMatrix<double,RowMajor>* basis) {
 }
 
 ImageManager::~ImageManager() {
-  SDL_FreeSurface(image);}
+  SDL_FreeSurface(image);
+}
 
 SparseMatrix<double,RowMajor>* ImageManager::GetLaplacian() {
   SparseMatrix<double,RowMajor> *L = new SparseMatrix<double,RowMajor>(image->w * image->h, image->w * image->h);

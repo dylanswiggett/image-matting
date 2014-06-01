@@ -22,7 +22,7 @@ We can now return to our original equation, but now rewritten as
 \[(L+U)\textbf{u}=f\Rightarrow
 L\textbf{u}=-U\textbf{u}+\textbf{f}\Rightarrow
 \textbf{u}=-UL^{-1}\textbf{u}+L^{-1}\textbf{f}\]
-This immediately resembles a relaxation formula, with $P=-UL^{-1}$ and $\textbf{g}=L^{-1}\textbf{f}$. Further, the triangular matrix $L$ is computationally simple to invert. All that remains is to show convergence when applied to approximate solutions. In fact, in this situation, $\rho(A)\leq 1-a/N^2<1$, for some positive constant $a$ \cite{lee14}. Then we know that convergence will occur, although perhaps quite slowly. Unfortunately, slow convergence is usually the case. To demonstrate this, an example used in both \cite{lee14} and \cite{briggs87} is here supplied:
+This immediately resembles a relaxation formula, with $P=-UL^{-1}$ and $\textbf{g}=L^{-1}\textbf{f}$. Further, the triangular matrix $L$ is computationally simple to invert by forward-substitution. All that remains is to show convergence when applied to approximate solutions. In fact, in this situation, $\rho(A)\leq 1-a/N^2<1$, for some positive constant $a$ \cite{lee14}. Then we know that convergence will occur, although perhaps quite slowly. Unfortunately, slow convergence is usually the case. To demonstrate this, an example used in both \cite{lee14} and \cite{briggs87} is here supplied:
 \begin{quote}
 \item
 \subparagraph{Example}
@@ -48,4 +48,4 @@ Although this is a simplified model, such oscillatory eigenfunctions are found i
 \[\mu_i^h=\cos^2(\pi i h)\]
 This does not bode well for convergence. We take $\textbf{v}$ to be our initial estimate for $\textbf{u}$, and as previously we define $\textbf{e}=\textbf{v}-\textbf{u}$. From our eigenfunctions, we now see that highly oscillatory components of our $\textbf{e}$ converge to $0$ rapidly, but less oscillatory components converge at a rate close to $1$. Further, since our eigenfunctions are exactly these oscillatory components, only the amplitude is damped, while the frequency is left unchanged. In practice, this means that after a few iterations, the high frequency components vanish and the low frequency components are left behind, and require an immense number of iterations to satisfactorily remove. This behavior is known as \textbf{smoothing}, and is an unfortunate property of most relaxing methods \cite{briggs87}.
 \end{quote}
-Although we now have in the Gauss-Seidel method a convergant relaxation matrix, another step is clearly needed to make its use computationally feasible (both in theory and in practice). No known matting laplacian solvers avoid this behavior, so a workaround is necessary \cite{lee14}.
+Although we now have in the Gauss-Seidel method a convergant relaxation matrix, another step is clearly needed to make its use computationally feasible (both in theory and in practice). No known iterative matting laplacian solvers avoid this behavior, so a workaround is necessary \cite{lee14}.

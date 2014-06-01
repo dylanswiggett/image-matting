@@ -21,7 +21,7 @@ where $L$ is an $N\times N$ matrix with
 	1+\frac{1}{\frac{\epsilon}{|w_k|}+\sigma_k^2}
 	(I_i-\mu_k)(I_j-\mu_k)
 \right]\right)\]
-where $\delta_{ij}$ is the Kronecker delta ($1$ if $i=j$, $0$ otherwise), $\mu_k$ and $\sigma_k$ are the mean and std. dev. of the color in box $w_k$, and $|w_k|$ is the number of pixels in $w_k$. Note that our sum is over each small box (usually of fixed size) that contains both pixels $i$ and $j$, so points far apart from each other produce a value of zero.
+where $\delta_{ij}$ is the Kronecker delta ($1$ if $i=j$, $0$ otherwise), $\mu_k$ and $\sigma_k$ are the mean and std. dev. of the color in box $w_k$, and $|w_k|$ is the number of pixels in $w_k$. Note that our sum is over each small box (usually of fixed size) that contains both pixels $i$ and $j$.
 \end{matlapthm}
 \begin{proof}
 For each $w_k$, we define the $(|w_k|+1)\times2$ matrix $G_k$ where the first $|w_k|$ rows are $[I_i,1]$ for each $i\in w_k$, and the last row is $[\sqrt{\epsilon},0]$. Next we define the $(|w_k|+1)\times1$ matrix $\bar{\alpha}_k$ where the first $i$ rows are the values of $\alpha_i$ for $i\in w_k$ and the last is $0$. We can then rewrite $J(\alpha,a,b)$ as
