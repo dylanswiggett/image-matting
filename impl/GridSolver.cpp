@@ -20,16 +20,12 @@ void GridSolver::solve(SparseMatrix<double,RowMajor>* guess, double threshold) {
   // V-CYCLE
   
   // Relax on Au=f
-  // int num_iters = 1000 / guess->rows();
-  // if (num_iters == 0) num_iters = 1;
-  int num_iters = 1;
-  for (int i = 0; i < num_iters; i++)
-    relax(guess);
+  relax(guess);
 
   // std::cout << "INITIAL GUESS WITH THRESH " << threshold << std::endl;
   // std::cout << *guess << std::endl;
 
-  if (threshold > .01 && guess->rows() > 1) {
+  if (threshold > .01 && guess->rows() >= 1) {
     // r <- f - Au
     SparseMatrix<double,RowMajor> residue = *sol_ - *a_mat_ * (*guess);
 
@@ -69,8 +65,7 @@ void GridSolver::solve(SparseMatrix<double,RowMajor>* guess, double threshold) {
   }
 
   // Relax on Au=f
-  for (int i = 0; i < num_iters; i++)
-    relax(guess);
+  relax(guess);
 }
 
 void GridSolver::relax(SparseMatrix<double,RowMajor>* guess) {
