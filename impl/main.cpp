@@ -12,14 +12,17 @@ using namespace Eigen;
 int main(int argc, char** argv) {
   SDL_Init(SDL_INIT_EVERYTHING);
 
-  ImageManager img("test_img/ted.bmp");
-  ImageManager img_guess("test_img/ted_guess.bmp");
+  // ImageManager("test_img/pooh_med.bmp").downsize()->downsize()->SaveTo("test_img/pooh_med_downsize.bmp");
+
+  // return 0;
+
+  ImageManager img("test_img/pooh_med.bmp");
+  ImageManager img_guess("test_img/pooh_med_guess.bmp");
 
   FGBGMatte matte(&img, &img_guess);
 
   ImageManager matte_img(matte.GetMatte());
 
-  matte_img.SaveTo("test_img/ted_result.bmp");
-
+  matte_img.SaveTo("test_img/pooh_med_result.bmp");
   return 0;
 }

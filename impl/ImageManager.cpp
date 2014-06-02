@@ -62,12 +62,13 @@ ImageManager::ImageManager(SparseMatrix<double,RowMajor>* rMat, SparseMatrix<dou
       int r = (int) (rMat->coeff(x,y) * 255.0);
       int g = (int) (gMat->coeff(x,y) * 255.0);
       int b = (int) (bMat->coeff(x,y) * 255.0);
-
       if (r > 255) r = 255;
       if (g > 255) g = 255;
       if (b > 255) b = 255;
 
-      pixels[(y * image->w) + x] = (r) + (g << 8) + (b << 16);
+      Uint32 pixel = SDL_MapRGB(image->format, r, g, b);
+
+      pixels[(y * image->w) + x] = pixel;
     }
   }
 }
@@ -315,11 +316,11 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
 void ImageManager::GetIntensity(int x, int y, double *r, double *g, double *b) {
   // return ((double) GetPixel(x,y)) / 255.0;
   // return ((double) ((GetPixel(x,y) & 0x0000ff00) >> 8)) / 255.0;
-  int color_bits = GetPixel(x,y);
-  *r = ((double)((color_bits) & 0xff)) / 255.0;
-  *g = ((double)((color_bits >> 8) & 0xff)) / 255.0;
-  *b = ((double)((color_bits >> 16) & 0xff)) / 255.0;
-  // std::cout << *r << ", " << *g << ", " << *b << std::endl;
+  Uint8 ri, gi, bi;
+  SDL_GetRGB(GetPixel(x,y), image->format, &ri, &bi, &gi);
+  *r = ((double) ri) / 255.0;
+  *g = ((double) gi) / 255.0;
+  *b = ((double) bi) / 255.0;
 }
 
 int ImageManager::GetPixel(int x, int y) {
@@ -339,11 +340,11 @@ int ImageManager::GetPixel(int x, int y) {
         break;
 
     case 3:
-        // if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            // return p[0] << 16 | p[1] << 8 | p[2];
-        // else
+        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            return p[0] << 16 | p[1] << 8 | p[2];
+        else
             return p[0] | p[1] << 8 | p[2] << 16;
-        // break;
+        break;
 
     case 4:
         return *(Uint32 *)p;
