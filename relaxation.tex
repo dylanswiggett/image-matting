@@ -7,8 +7,8 @@ We then note that, in combination with our original system of equations, we have
 \[A\textbf{e}=\textbf{r}\]
 This is known as the \textbf{residual equation} \cite{briggs87}. While the error is not immediately available unless the system of equations is already solved, the residual can be calculated at any intermediate step, so this gives us a first clue as to how an iterative step might be produced:
 \[\textbf{u}=\textbf{v}+\textbf{e}=
-	\textbf{v}+A^{-1}\textbf{r}=P\textbf{v}+\textbf{g}\]
-Since $A^{-1}$ is usually very difficult to compute, the goal of \textbf{relaxation} is to find some approximation, $B$ (or $P$ and $\textbf{g}$, depending on notation). We denote the residual and approximation after $n$ steps by $\textbf{r}^{(n)}$ and $\textbf{v}^{(n)}$, and rephrase our goal as finding a $B\approx A^{-1}$ such that
+	\textbf{v}+A^{-1}\textbf{r}\]
+Since $A^{-1}$ is usually very difficult to compute, the goal of \textbf{relaxation} is to find some approximation. We denote the residual and approximation after $n$ steps by $\textbf{r}^{(n)}$ and $\textbf{v}^{(n)}$, and rephrase our goal as finding a $B\approx A^{-1}$ or a matrix $P$ and a vector $\textbf{g}$ such that
 \[\textbf{v}^{(n+1)}=\textbf{v}^{(n)}+B\textbf{r}^{(n)}
 	=P\textbf{v}^{(n)}+\textbf{g},
 \hspace{.5in}

@@ -22,7 +22,7 @@ We can now return to our original equation, but now rewritten as
 \[(L+U)\textbf{u}=f\Rightarrow
 L\textbf{u}=-U\textbf{u}+\textbf{f}\Rightarrow
 \textbf{u}=-UL^{-1}\textbf{u}+L^{-1}\textbf{f}\]
-This immediately resembles a relaxation formula, with $P=-UL^{-1}$ and $\textbf{g}=L^{-1}\textbf{f}$. Further, the triangular matrix $L$ is computationally simple to invert by forward-substitution. All that remains is to show convergence when applied to approximate solutions. In fact, in this situation, $\rho(A)\leq 1-a/N^2<1$, for some positive constant $a$ \cite{lee14}. Then we know that convergence will occur, although perhaps quite slowly. Unfortunately, slow convergence is usually the case. To demonstrate this, an example used in both \cite{lee14} and \cite{briggs87} is here supplied:
+This immediately resembles a relaxation formula, with $P=-UL^{-1}$ and $\textbf{g}=L^{-1}\textbf{f}$. Further, the matrix $-UL^{-1}$ is computationally simple to multiply by forward-substitution. All that remains is to show convergence when applied to approximate solutions. In fact, in this situation, $\rho(A)\leq 1-a/N^2<1$, for some positive constant $a$ \cite{lee14}. Then we know that convergence will occur, although perhaps quite slowly. Unfortunately, slow convergence is usually the case. To demonstrate this, an example used in both \cite{lee14} and \cite{briggs87} is here supplied:
 \begin{quote}
 \item
 \subparagraph{Example}

@@ -3,7 +3,7 @@ FLAGS = -O2
 main: main.o GridSampler.o ImageManager.o FGBGMatte.o
 	g++ -Wall -g -std=c++11 -o main main.o GridSampler.o ImageManager.o FGBGMatte.o -lSDL
 
-main.o: main.cpp GridSolver.hpp GridSampler.hpp ImageManager.hpp FGBGMatte.hpp 
+main.o: main.cpp GridSampler.hpp ImageManager.hpp FGBGMatte.hpp 
 	g++ -Wall -g -std=c++11 -c -o main.o main.cpp $(FLAGS)
 
 GridSampler.o: GridSampler.cpp GridSampler.hpp

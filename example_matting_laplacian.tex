@@ -9,7 +9,7 @@ Solving for $F$ and $B$ is now equivalent to solving for $a$ and $b$. This is do
 	\sum_{j\in I}\left(\sum_{i\in w_j}\left(
 		\alpha_i-a_jI_i-b_j\right)^2+\epsilon
 		a_j^2\right)\]
-with $w_j$ a small box around the pixel $j$. The last term of the sum serves to minimize $a_j$ where possible, and acts to both smooth the matte as a whole, and to resolve convergence where results might otherwise be indeterminate (e.g. a box where the image color is constant). Since the minimal values in each box are determinate, and since they overlap at nearby pixels, this cost function allows local changes to propagate through their neighbors. Cost minimization is solved in \cite{levin08} as follows.
+with $w_j$ a small box around the pixel $j$, and $\epsilon$ is some small, positive, user-chosen number. The last term of the sum serves to minimize $a_j$ where possible, and acts to both smooth the matte as a whole, and to resolve convergence where results might otherwise be indeterminate (e.g. a box where the image color is constant). Since the minimal values in each box are determinate, and since they overlap at nearby pixels, this cost function allows local changes to propagate through their neighbors. Cost minimization is solved in \cite{levin08} as follows.
 
 \newtheorem{matlapthm}{Theorem}
 \begin{matlapthm}
@@ -49,7 +49,7 @@ Note that in this form, we need only minimize $J$ in one variable rather than $3
 	1+\frac{1}{\frac{\epsilon}{|w_k|}+\sigma_k^2}
 	(I_i-\mu_k)(I_j-\mu_k)
 \right]\right)\]
-\textbf{(For my final draft, I will show the steps to produce this equality)}. Plugging this back into our formula for $J(\alpha)$ and rewriting our sum as matrix composition, we have our desired equation.
+Plugging this back into our formula for $J(\alpha)$ and rewriting our sum as matrix composition, we have our desired equation.
 \end{proof}
 $L$ is our matting laplacian. When looked at in a slightly different way, it is actually just the graph laplacian with a different affinity function, as stated previously. We define our adjacency matrix, $W$, by weights rather than by simple edge existence, so that for $i\neq j$, $W_{ij}=L_{ij}$, and $W_{ii}=0$. Then we define our degree matrix accordingly as a diagonal matrix with
 \[D_{ii}=\sum_j W_{ij}\]

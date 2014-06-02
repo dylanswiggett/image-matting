@@ -3,7 +3,6 @@
 #include <eigen3/Eigen/Sparse>
 
 #include "ImageManager.hpp"
-#include "GridSolver.hpp"
 #include "GridSampler.hpp"
 
 #include <iostream>
@@ -24,34 +23,6 @@ FGBGMatte::FGBGMatte(ImageManager *source, ImageManager *guess)
   image_sizes_->push_back(source);
 
   buildAMatrix(0);
-
-  // SparseMatrix<double,RowMajor> *L = source->GetLaplacian();
-
-  // SparseMatrix<double,RowMajor> *guess_mat = guess->GetGreyscaleMatrix();
-
-  // SparseMatrix<double,RowMajor> *f = new SparseMatrix<double,RowMajor>(guess_mat->rows(), guess_mat->cols());
-  // SparseMatrix<double,RowMajor> C(L->rows(), L->cols());
-
-  // for (int i = 0; i < guess_mat->rows(); i++) {
-  //   for (int j = 0; j < guess_mat->cols(); j++) {
-  //     double guess_val = guess_mat->coeff(i,j);
-  //     if (guess_val >= 1 || guess_val == 0) {
-  //       f->insert(i,j) = guess_val;
-  //       C.insert(i * guess_mat->cols() + j, i * guess_mat->cols() + j) = 1;
-  //     } else {
-  //       f->insert(i,j) = 0;
-  //     }
-  //   }
-  // }
-
-  // (*f) *= GAMMA;
-
-  // SparseMatrix<double,RowMajor> *A = new SparseMatrix<double,RowMajor>();
-  // (*A) = (*L) + C * GAMMA;
-
-  // a_matrices_->push_back(A);
-  // f_matrices_->push_back(f);
-
 }
 
 FGBGMatte::~FGBGMatte() {
@@ -64,7 +35,7 @@ SparseMatrix<double,RowMajor> *FGBGMatte::GetMatte() {
 
   SparseMatrix<double, RowMajor> *guess = guess_->GetGreyscaleMatrix();
 
-  for (int i = 0; i < 50; i++) {
+  for (int i = 0; i < 30; i++) {
     std::cout << "Iter: " << i << std::endl; //";    Resid. Norm: " << (A * *g).norm() << std::endl;
     guess = solve(guess, (*f_matrices_)[0], 0);
   }
