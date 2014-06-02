@@ -6,8 +6,8 @@
 #include <cmath> 
 #include <vector>
 
-#define LAPLACIAN_RAD 1
-#define MAX_LAP_RAD (double)(2 * LAPLACIAN_RAD + 1)
+#define LAPLACIAN_RAD 1.0
+#define MAX_LAP_RAD (2.0 * LAPLACIAN_RAD + 1.0)
 #define W_K (MAX_LAP_RAD * MAX_LAP_RAD)
 #define EPSILON .001
 
@@ -93,13 +93,15 @@ SparseMatrix<double,RowMajor>* ImageManager::GetLaplacian() {
 SparseMatrix<double,RowMajor>* ImageManager::GetGreyscaleMatrix() {
   SparseMatrix<double,RowMajor> *m = new SparseMatrix<double,RowMajor>(image->w,image->h);
 
-  m->reserve(image->w * image->h);
+  std::vector<Triplet<double>> *entries = new std::vector<Triplet<double>>();
 
   for (int x = 0; x < image->w; x++) {
     for (int y = 0; y < image->h; y++) {
-      m->insert(x,y) = GetIntensity(x,y);
+      entries->push_back(Triplet<double>(x, y, GetIntensity(x,y)));
     }
   }
+
+  m->setFromTriplets(entries->begin(), entries->end());
 
   return m;
 }
@@ -192,7 +194,7 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
 
 double ImageManager::GetIntensity(int x, int y) {
   // return ((double) GetPixel(x,y)) / 255.0;
-  return ((double) ((GetPixel(x,y) & 0x00ff0000) >> 16)) / 255.0;
+  return ((double) ((GetPixel(x,y) & 0x0000ff00) >> 8)) / 255.0;
 }
 
 int ImageManager::GetPixel(int x, int y) {

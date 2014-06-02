@@ -2,21 +2,23 @@
 
 #include <eigen3/Eigen/Sparse>
 #include <iostream>
+#include <vector>
 
 using namespace Eigen;
 
 SparseMatrix<double,RowMajor>* GridSampler::upsample(int newWidth, int newHeight) {
   SparseMatrix<double,RowMajor> *newMat = new SparseMatrix<double,RowMajor>(newWidth, newHeight);
 
-  for (int k = 0; k < mat_->outerSize(); ++k){
-    for (Eigen::SparseMatrix<double,RowMajor>::InnerIterator it(*mat_, k); it; ++it){
-      for (int i = -1; i <= 1; ++i) {
-        for (int j = -1; j <= 1; ++j) {
-          upsampleIndex(mat_, newMat, 2*it.row() + i, 2*it.col() + j);
-        }
-      }
+  std::vector<Triplet<double>> trip_list;
+  trip_list.reserve(newWidth * newHeight);
+
+  for (int i = 0; i < newWidth; i++) {
+    for (int j = 0; j < newHeight; j++) {
+      trip_list.push_back(Triplet<double>(i, j, upsampleIndex(mat_, i, j)));
     }
   }
+
+  newMat->setFromTriplets(trip_list.begin(), trip_list.end());
 
   return newMat;
 }
@@ -28,11 +30,16 @@ SparseMatrix<double,RowMajor>* GridSampler::downsample() {
   if (mat_->cols() % 2 == 1) num_cols++;
   SparseMatrix<double,RowMajor> *newMat = new SparseMatrix<double,RowMajor>(num_rows, num_cols);
 
-  for (int k = 0; k < mat_->outerSize(); ++k){
-    for (Eigen::SparseMatrix<double,RowMajor>::InnerIterator it(*mat_, k); it; ++it){
-      downsampleIndex(mat_, newMat, it.row(), it.col());
+  std::vector<Triplet<double>> trip_list;
+  trip_list.reserve(num_rows * num_cols);
+
+  for (int i = 0; i < newMat->rows(); i++) {
+    for (int j = 0; j < newMat->cols(); j++) {
+      trip_list.push_back(Triplet<double>(i, j, downsampleIndex(mat_, i, j)));
     }
   }
+
+  newMat->setFromTriplets(trip_list.begin(), trip_list.end());
 
   return newMat;
 }
@@ -51,10 +58,7 @@ void incrValidIndex(SparseMatrix<double,RowMajor>* mat, int i, int j, double amt
     mat->coeffRef(i,j) += amt;
 }
 
-void GridSampler::upsampleIndex(const SparseMatrix<double,RowMajor>* src, SparseMatrix<double,RowMajor>* dest, int iDest, int jDest) {
-  if (iDest < 0 || iDest >= dest->rows() || jDest < 0 || jDest >= dest->cols())
-    return;
-
+double GridSampler::upsampleIndex(const SparseMatrix<double,RowMajor>* src, int iDest, int jDest) {
   int i = (iDest / 2);
   int j = (jDest / 2);
   // int i0 = i - 1;
@@ -86,27 +90,15 @@ void GridSampler::upsampleIndex(const SparseMatrix<double,RowMajor>* src, Sparse
     }
   }
 
-  // if (sampleValidIndex(i0,j0, src, &result1)) scale_factor += .25;
-  // if (sampleValidIndex(i1,j0, src, &result1)) scale_factor += .25;
-  // if (sampleValidIndex(i1,j1, src, &result1)) scale_factor += .25;
-  // if (sampleValidIndex(i0,j1, src, &result1)) scale_factor += .25;
-
-  // if (sampleValidIndex(i0,j, src, &result2)) scale_factor += .5;
-  // if (sampleValidIndex(i1,j, src, &result2)) scale_factor += .5;
-  // if (sampleValidIndex(i,j0, src, &result2)) scale_factor += .5;
-  // if (sampleValidIndex(i,j1, src, &result2)) scale_factor += .5;
-
-  // if (sampleValidIndex(i,j, src, &result3)) scale_factor += 1;
-
   if (scale_factor == 0)
-    dest->coeffRef(iDest, jDest) = 0;
+    return 0;
   else
-    dest->coeffRef(iDest, jDest) = (result1 * .25 + result2 * .5 + result3) / scale_factor;
+    return (result1 * .25 + result2 * .5 + result3) / scale_factor;
 }
 
-void GridSampler::downsampleIndex(const SparseMatrix<double,RowMajor>* src, SparseMatrix<double,RowMajor>* dest, int i, int j) {
-  i = (i / 2) * 2;
-  j = (j / 2) * 2;
+double GridSampler::downsampleIndex(const SparseMatrix<double,RowMajor>* src, int i, int j) {
+  i = i * 2;
+  j = j * 2;
   int i0 = i - 1;
   int i1 = i + 1;
   int j0 = j - 1;
@@ -129,5 +121,5 @@ void GridSampler::downsampleIndex(const SparseMatrix<double,RowMajor>* src, Spar
 
   if (sampleValidIndex(i,j, src, &result3)) scale_factor += .25;
 
-  dest->coeffRef(i / 2,j / 2) = (result1 * .0625 + result2 * .125 + result3 * .25) / scale_factor;
+  return (result1 * .0625 + result2 * .125 + result3 * .25) / scale_factor;
 }

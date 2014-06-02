@@ -27,18 +27,18 @@ int main(int argc, char** argv) {
   // }
   // m->makeCompressed();
 
-  ImageManager img("test_img/ted_square.bmp");
-  ImageManager img_guess("test_img/ted_square_guess.bmp");
+  ImageManager img("test_img/morrow.bmp");
+  ImageManager img_guess("test_img/morrow_guess.bmp");
 
-  // img_guess.SaveTo("test_img/ted_square_guess_copy.bmp");
+  // img_guess.SaveTo("test_img/morrow_guess_copy.bmp");
 
-  // ImageManager(img.GetLaplacian()).SaveTo("test_img/ted_square_laplacian.bmp");
+  // ImageManager(img.GetLaplacian()).SaveTo("test_img/morrow_laplacian.bmp");
 
   FGBGMatte matte(&img, &img_guess);
 
   ImageManager matte_img(matte.GetMatte());
 
-  matte_img.SaveTo("test_img/ted_square_result.bmp");
+  matte_img.SaveTo("test_img/morrow_result.bmp");
   // ImageManager(img.GetGreyscaleMatrix()).SaveTo("test_img/small_2color_resave.bmp");
   // ImageManager(img_guess.GetGreyscaleMatrix()).SaveTo("test_img/small_2color_guess_resave.bmp");
 

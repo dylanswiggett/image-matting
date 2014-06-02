@@ -11,8 +11,8 @@ class GridSampler {
   SparseMatrix<double,RowMajor>* upsample(int newWidth, int newHeight);
   SparseMatrix<double,RowMajor>* downsample();
  private:
-  void upsampleIndex(const SparseMatrix<double,RowMajor>* src, SparseMatrix<double,RowMajor>* dest, int i, int j);
-  void downsampleIndex(const SparseMatrix<double,RowMajor>* src, SparseMatrix<double,RowMajor>* dest, int i, int j);
+  double upsampleIndex(const SparseMatrix<double,RowMajor>* src, int i, int j);
+  double downsampleIndex(const SparseMatrix<double,RowMajor>* src, int i, int j);
   const SparseMatrix<double,RowMajor>* mat_;
 };
 

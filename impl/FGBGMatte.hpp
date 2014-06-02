@@ -19,6 +19,7 @@ class FGBGMatte {
   void relax(SparseMatrix<double,RowMajor>* A, SparseMatrix<double,RowMajor>* f, SparseMatrix<double,RowMajor>* guess);
 
   ImageManager *guess_;
+  SparseMatrix<double,RowMajor> *guess_matrix_;
 
   std::vector<ImageManager *> *image_sizes_;
   std::vector<SparseMatrix<double,RowMajor> *> *a_matrices_;
