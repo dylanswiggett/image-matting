@@ -34,6 +34,25 @@ SparseMatrix<double,RowMajor> *FGBGMatte::GetMatte() {
   // From "Scalable Matting: A Sub-linear Approach," by Lee and Wu.
 
   SparseMatrix<double, RowMajor> *guess = guess_->GetGreyscaleMatrix();
+  SparseMatrix<double, RowMajor> *betterGuess = new SparseMatrix<double, RowMajor>(guess->rows(), guess->cols());
+
+  std::vector<Triplet<double>> trip_list;
+  trip_list.reserve(guess->size());
+
+  for (int k = 0; k < guess->outerSize(); ++k){
+    for (Eigen::SparseMatrix<double,RowMajor>::InnerIterator it(*guess, k); it; ++it){
+      if (it.value() == 1) {
+        trip_list.push_back(Triplet<double>(it.row(),it.col(),1));
+      } else {
+        trip_list.push_back(Triplet<double>(it.row(),it.col(),0));
+      }
+    }
+  }
+
+  betterGuess->setFromTriplets(trip_list.begin(), trip_list.end());
+
+  delete guess;
+  guess = betterGuess;
 
   for (int i = 0; i < 30; i++) {
     std::cout << "Iter: " << i << std::endl; //";    Resid. Norm: " << (A * *g).norm() << std::endl;
