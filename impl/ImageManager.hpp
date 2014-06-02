@@ -23,6 +23,7 @@ class ImageManager {
  public:
   ImageManager(std::string path);
   ImageManager(SparseMatrix<double,RowMajor>* basis);
+  ImageManager(SparseMatrix<double,RowMajor>* r, SparseMatrix<double,RowMajor>* g, SparseMatrix<double,RowMajor> *b);
   ~ImageManager();
 
   SparseMatrix<double,RowMajor>* GetLaplacian();
@@ -34,9 +35,11 @@ class ImageManager {
   int GetW() { return image->w; }
   int GetH() { return image->h; }
 
+  ImageManager* downsize();
+
  private:
   double LaplaciantAt(int x1, int y1, int x2, int y2);
-  double GetIntensity(int x, int y);
+  void GetIntensity(int x, int y, double* r, double* g, double* b);
   int GetPixel(int x, int y);
 
   SDL_Surface *image;

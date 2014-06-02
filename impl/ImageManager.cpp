@@ -5,6 +5,9 @@
 #include <string>
 #include <cmath> 
 #include <vector>
+#include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/LU>
+#include "GridSampler.hpp"
 
 #define LAPLACIAN_RAD 1.0
 #define MAX_LAP_RAD (2.0 * LAPLACIAN_RAD + 1.0)
@@ -37,8 +40,34 @@ ImageManager::ImageManager(SparseMatrix<double,RowMajor>* basis) {
         color = -color;
       if (color > 255)
         color = 255;
-      pixels[(y * image->w) + x] = (color << 8) + 0xff;
-      // pixels[(y * image->w) + x] = 0xffffffff;
+      pixels[(y * image->w) + x] = (color << 8) + (color << 16) + (color << 24) + 0xff;
+    }
+  }
+}
+
+ImageManager::ImageManager(SparseMatrix<double,RowMajor>* rMat, SparseMatrix<double,RowMajor>* gMat, SparseMatrix<double,RowMajor> *bMat) {
+  image = SDL_CreateRGBSurface(0,             // flags
+                               rMat->rows(), // width
+                               rMat->cols(), // height
+                               32,            // depth
+                               0,    // Rmask
+                               0,    // Gmask
+                               0,    // Bmask
+                               0);   // Amask
+
+  Uint32 *pixels = (Uint32 *)image->pixels;
+
+  for (int x = 0; x < rMat->rows(); x++) {
+    for (int y = 0; y < rMat->cols(); y++) {
+      int r = (int) (rMat->coeff(x,y) * 255.0);
+      int g = (int) (gMat->coeff(x,y) * 255.0);
+      int b = (int) (bMat->coeff(x,y) * 255.0);
+
+      if (r > 255) r = 255;
+      if (g > 255) g = 255;
+      if (b > 255) b = 255;
+
+      pixels[(y * image->w) + x] = (r) + (g << 8) + (b << 16);
     }
   }
 }
@@ -95,9 +124,12 @@ SparseMatrix<double,RowMajor>* ImageManager::GetGreyscaleMatrix() {
 
   std::vector<Triplet<double>> *entries = new std::vector<Triplet<double>>();
 
+  double r, g, b;
+
   for (int x = 0; x < image->w; x++) {
     for (int y = 0; y < image->h; y++) {
-      entries->push_back(Triplet<double>(x, y, GetIntensity(x,y)));
+      GetIntensity(x,y,&r,&g,&b);
+      entries->push_back(Triplet<double>(x, y, (r + g + b) / 3.0));
     }
   }
 
@@ -111,9 +143,12 @@ SparseMatrix<double,RowMajor>* ImageManager::GetGreyscaleVector() {
 
   m->reserve(image->w * image->h);
 
+  double r, g, b;
+
   for (int x = 0; x < image->w; x++) {
     for (int y = 0; y < image->h; y++) {
-      m->insert(x * image->h + y, 0) = GetIntensity(x,y);
+      GetIntensity(x,y,&r,&g,&b);
+      m->insert(x * image->h + y, 0) = (r + g + b) / 3.0;
     }
   }
 
@@ -122,6 +157,38 @@ SparseMatrix<double,RowMajor>* ImageManager::GetGreyscaleVector() {
 
 void ImageManager::SaveTo(std::string path) {
   SDL_SaveBMP(image, path.c_str());
+}
+
+ImageManager* ImageManager::downsize() {
+  SparseMatrix<double,RowMajor> *rMat = new SparseMatrix<double,RowMajor>(image->w,image->h);
+  SparseMatrix<double,RowMajor> *gMat = new SparseMatrix<double,RowMajor>(image->w,image->h);
+  SparseMatrix<double,RowMajor> *bMat = new SparseMatrix<double,RowMajor>(image->w,image->h);
+
+  std::vector<Triplet<double>> *rEntries = new std::vector<Triplet<double>>();
+  std::vector<Triplet<double>> *gEntries = new std::vector<Triplet<double>>();
+  std::vector<Triplet<double>> *bEntries = new std::vector<Triplet<double>>();
+
+  double r, g, b;
+
+  for (int x = 0; x < image->w; x++) {
+    for (int y = 0; y < image->h; y++) {
+      GetIntensity(x,y,&r,&g,&b);
+      rEntries->push_back(Triplet<double>(x, y, r));
+      gEntries->push_back(Triplet<double>(x, y, g));
+      bEntries->push_back(Triplet<double>(x, y, b));
+    }
+  }
+
+  rMat->setFromTriplets(rEntries->begin(), rEntries->end());
+  gMat->setFromTriplets(gEntries->begin(), gEntries->end());
+  bMat->setFromTriplets(bEntries->begin(), bEntries->end());
+
+  rMat = GridSampler(rMat).downsample();
+  gMat = GridSampler(gMat).downsample();
+  bMat = GridSampler(bMat).downsample();
+
+
+  return new ImageManager(rMat, gMat, bMat);
 }
 
 double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
@@ -134,8 +201,17 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
     return 0;
   // return 1;
 
-  double I1 = GetIntensity(x1, y1);
-  double I2 = GetIntensity(x2, y2);
+  double I1r, I1g, I1b;
+  double I2r, I2g, I2b;
+
+  MatrixXd I1(3,1);
+  MatrixXd I2(3,1);
+
+  GetIntensity(x1, y1, &I1r, &I1g, &I1b);
+  GetIntensity(x2, y2, &I2r, &I2g, &I2b);
+
+  I1 << I1r, I1g, I1b;
+  I2 << I2r, I2g, I2b;
 
   double kronecker = (x1 == x2 && y1 == y2) ? 1 : 0;
 
@@ -158,8 +234,15 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
 
       double wk = 0;
 
-      double mean = 0;
-      double variance = 0;
+      double rm = 0;
+      double gm = 0;
+      double bm = 0;
+      double rrv = 0;
+      double rgv = 0;
+      double rbv = 0;
+      double ggv = 0;
+      double gbv = 0;
+      double bbv = 0;
 
       // A single window (centered at pixel k) that contains both pixels i and j
       for (int x = -LAPLACIAN_RAD; x <= LAPLACIAN_RAD; ++x) {
@@ -167,20 +250,57 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
           int xp = kx + x;
           int yp = ky + y;
           if (xp >= 0 && yp >= 0 && xp < image->w && yp < image->h) {
-            double intensity = GetIntensity(xp, yp);
-            mean += intensity;
-            variance += intensity * intensity;
+            double r, g, b;
+            GetIntensity(xp, yp, &r, &g, &b);
+
+            rm += r;
+            gm += g;
+            bm += b;
+
+            rrv += r * r;
+            rgv += r * g;
+            rbv += r * b;
+            ggv += g * g;
+            gbv += g * b;
+            bbv += b * b;
+            
             wk++;
           }
         }
       }
 
-      mean /= wk;
-      variance = variance / wk - mean * mean;
+      rm  /= wk;
+      gm  /= wk;
+      bm  /= wk;
+
+      rrv /= wk;
+      rgv /= wk;
+      rbv /= wk;
+      ggv /= wk;
+      gbv /= wk;
+      bbv /= wk;
+
+      rrv -= rm * rm;
+      rgv -= rm * gm;
+      rbv -= rm * bm;
+      ggv -= gm * gm;
+      gbv -= gm * bm;
+      bbv -= bm * bm;
+
+      Matrix3d covariance;
+      MatrixXd mean(3,1);
+      MatrixXd variance(3,1);
+
+      covariance << rrv, rgv, rbv,
+                    rgv, ggv, gbv,
+                    rbv, gbv, bbv;
+      mean << rm, gm, bm;
+      variance << rrv, ggv, bbv;
+
+      MatrixXd middleMat = covariance + (EPSILON / wk) * Matrix3d::Identity();
 
       double value = (1.0 / wk) *
-                     (1.0 + (1.0 / (EPSILON/wk + variance)) *
-                                (I1 - mean) * (I2 - mean));
+                     (1.0 + ((I1 - mean).transpose() * middleMat.inverse() * (I2 - mean)).coeff(0,0));
 
       // if (value == (1.0 / wk))
       //   std::cout << "ZERO" << std::endl;
@@ -192,9 +312,14 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
   return q;
 }
 
-double ImageManager::GetIntensity(int x, int y) {
+void ImageManager::GetIntensity(int x, int y, double *r, double *g, double *b) {
   // return ((double) GetPixel(x,y)) / 255.0;
-  return ((double) ((GetPixel(x,y) & 0x0000ff00) >> 8)) / 255.0;
+  // return ((double) ((GetPixel(x,y) & 0x0000ff00) >> 8)) / 255.0;
+  int color_bits = GetPixel(x,y);
+  *r = ((double)((color_bits) & 0xff)) / 255.0;
+  *g = ((double)((color_bits >> 8) & 0xff)) / 255.0;
+  *b = ((double)((color_bits >> 16) & 0xff)) / 255.0;
+  // std::cout << *r << ", " << *g << ", " << *b << std::endl;
 }
 
 int ImageManager::GetPixel(int x, int y) {
@@ -214,13 +339,11 @@ int ImageManager::GetPixel(int x, int y) {
         break;
 
     case 3:
-        if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
-            return p[0] << 16 | p[1] << 8 | p[2];
-        else
+        // if(SDL_BYTEORDER == SDL_BIG_ENDIAN)
+            // return p[0] << 16 | p[1] << 8 | p[2];
+        // else
             return p[0] | p[1] << 8 | p[2] << 16;
-        break;
-        // return p[0];  // Just one color component.
-        // TODO: Support multi-color images.
+        // break;
 
     case 4:
         return *(Uint32 *)p;

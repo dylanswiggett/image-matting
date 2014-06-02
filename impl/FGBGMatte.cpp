@@ -170,9 +170,9 @@ SparseMatrix<double, RowMajor>* FGBGMatte::solve(SparseMatrix<double,RowMajor>* 
 
   // Get our scaled matrices, if necessary.
   if (level >= a_matrices_->size()) {
-    SparseMatrix<double,RowMajor> *downsampled_image = GridSampler((*image_sizes_)[level - 1]->GetGreyscaleMatrix()).downsample();
+    // SparseMatrix<double,RowMajor> *downsampled_image = GridSampler((*image_sizes_)[level - 1]->GetGreyscaleMatrix()).downsample();
 
-    image_sizes_->push_back(new ImageManager(downsampled_image));
+    image_sizes_->push_back((*image_sizes_)[level - 1]->downsize());
     buildAMatrix(level);
   }
   a_mat = (*a_matrices_)[level];
