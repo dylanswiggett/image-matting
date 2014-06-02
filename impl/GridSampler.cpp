@@ -61,9 +61,7 @@ void incrValidIndex(SparseMatrix<double,RowMajor>* mat, int i, int j, double amt
 double GridSampler::upsampleIndex(const SparseMatrix<double,RowMajor>* src, int iDest, int jDest) {
   int i = (iDest / 2);
   int j = (jDest / 2);
-  // int i0 = i - 1;
   int i1 = i + 1;
-  // int j0 = j - 1;
   int j1 = j + 1;
 
   double result1 = 0;

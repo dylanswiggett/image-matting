@@ -43,7 +43,6 @@ class ImageManager {
   int GetPixel(int x, int y);
 
   SDL_Surface *image;
-  std::map<Coord,double> *saved_ks_;
 };
 
 #endif  // IMAGE_MANAGER_HPP_

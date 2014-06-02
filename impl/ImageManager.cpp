@@ -46,14 +46,14 @@ ImageManager::ImageManager(SparseMatrix<double,RowMajor>* basis) {
 }
 
 ImageManager::ImageManager(SparseMatrix<double,RowMajor>* rMat, SparseMatrix<double,RowMajor>* gMat, SparseMatrix<double,RowMajor> *bMat) {
-  image = SDL_CreateRGBSurface(0,             // flags
+  image = SDL_CreateRGBSurface(0,            // flags
                                rMat->rows(), // width
                                rMat->cols(), // height
-                               32,            // depth
-                               0,    // Rmask
-                               0,    // Gmask
-                               0,    // Bmask
-                               0);   // Amask
+                               32,           // depth
+                               0,            // Default Rmask
+                               0,            // Default Gmask
+                               0,            // Default Bmask
+                               0);           // Default Amask
 
   Uint32 *pixels = (Uint32 *)image->pixels;
 
@@ -79,7 +79,6 @@ ImageManager::~ImageManager() {
 
 SparseMatrix<double,RowMajor>* ImageManager::GetLaplacian() {
   SparseMatrix<double,RowMajor> *L = new SparseMatrix<double,RowMajor>(image->w * image->h, image->w * image->h);
-  // L->reserve(image->w * image->h * 100);
 
   std::vector<Triplet<double>> tripletList;
   tripletList.reserve(image->w * image->h * 100);
@@ -102,20 +101,6 @@ SparseMatrix<double,RowMajor>* ImageManager::GetLaplacian() {
   }
 
   L->setFromTriplets(tripletList.begin(), tripletList.end());
-
-  // for (int x1 = 0; x1 < image->w; ++x1) {
-  //   std::cout << x1 << std::endl;
-  //   for (int y1 = 0; y1 < image->h; ++y1) {
-  //     double diagonal = 0;
-  //     for (int x2 = 0; x2 < image->w; ++x2) {
-  //       for (int y2 = 0; y2 < image->h; ++y2) {
-  //         if (x2 != x1 || y2 != y1)
-  //           diagonal += L->coeff(x1 * image->h + y1, x2 * image->h + y2);
-  //       }
-  //     }
-  //     L->coeffRef(x1 * image->h + y1, x1 * image->h + y1) = -diagonal;
-  //   }
-  // }
 
   return L;
 }
@@ -188,19 +173,14 @@ ImageManager* ImageManager::downsize() {
   gMat = GridSampler(gMat).downsample();
   bMat = GridSampler(bMat).downsample();
 
-
   return new ImageManager(rMat, gMat, bMat);
 }
 
 double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
   // Based on "A Closed Form Solution to Natural Image Matting" by Levin et al.
 
-  // if (x1 == 0 && y1 == 0)
-  //   std::cout << "x1: " << x1 << ", y1: " << y1 << ", x2: " << x2 << ", y2: " << y2 << std::endl;
-
   if (abs(x2 - x1) > MAX_LAP_RAD || abs(y2 - y1) > MAX_LAP_RAD)
     return 0;
-  // return 1;
 
   double I1r, I1g, I1b;
   double I2r, I2g, I2b;
@@ -302,9 +282,6 @@ double ImageManager::LaplaciantAt(int x1, int y1, int x2, int y2) {
 
       double value = (1.0 / wk) *
                      (1.0 + ((I1 - mean).transpose() * middleMat.inverse() * (I2 - mean)).coeff(0,0));
-
-      // if (value == (1.0 / wk))
-      //   std::cout << "ZERO" << std::endl;
 
       q += kronecker - value;
     }

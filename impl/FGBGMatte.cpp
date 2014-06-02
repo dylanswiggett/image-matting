@@ -92,7 +92,6 @@ void FGBGMatte::buildAMatrix(uint level) {
   for (int i = 0; i < f->rows(); i++) {
     for (int j = 0; j < f->cols(); j++) {
       double guess_val = guess_matrix_->coeff(i * dim,j * dim);
-      // std::cout << guess_val << std::endl;
       if (guess_val >= 1 || guess_val == 0) {
         f->insert(i,j) = guess_val;
         C.insert(i * f->cols() + j, i * f->cols() + j) = 1;
@@ -109,9 +108,7 @@ void FGBGMatte::buildAMatrix(uint level) {
     delete f;
   }
 
-    (*A) = (*L) + C * GAMMA;
-  // } else
-  //   (*A) = (*L);
+  (*A) = (*L) + C * GAMMA;
 
   a_matrices_->push_back(A);
 
@@ -126,7 +123,6 @@ SparseMatrix<double,RowMajor>* matToVec(SparseMatrix<double,RowMajor>* mat, int 
   std::vector<Triplet<double>> trip_list;
   trip_list.reserve(length);
 
-  // vec->reserve(mat->size());
   for (int k = 0; k < mat->outerSize(); ++k){
     for (Eigen::SparseMatrix<double,RowMajor>::InnerIterator it(*mat, k); it; ++it){
       trip_list.push_back(Triplet<double>(it.row() * mat->cols() + it.col(), 0, it.value()));
@@ -140,17 +136,14 @@ SparseMatrix<double,RowMajor>* matToVec(SparseMatrix<double,RowMajor>* mat, int 
 
 SparseMatrix<double,RowMajor>* vecToMat(SparseMatrix<double,RowMajor>* vec, int rows, int cols) {
   SparseMatrix<double,RowMajor> *mat = new SparseMatrix<double,RowMajor>(rows, cols);
-  // mat->reserve(vec->rows());
 
   std::vector<Triplet<double>> trip_list;
   trip_list.reserve(vec->size());
 
   for (int i = 0; i < vec->rows(); i++){
-    // std::cout << "TEST" << std::endl;
     int row = i / cols;
     int col = i % cols;
     if (row < rows && col < cols) {
-      // mat->insert(row, col) = vec->coeff(i, 0);
       trip_list.push_back(Triplet<double>(row, col, vec->coeff(i,0)));
     }
   }
@@ -213,6 +206,7 @@ SparseMatrix<double, RowMajor>* FGBGMatte::solve(SparseMatrix<double,RowMajor>* 
   return final_guess_square;
 }
 
+// Gauss-Seidel Relaxation
 void FGBGMatte::relax(SparseMatrix<double,RowMajor>* A, SparseMatrix<double,RowMajor>* f, SparseMatrix<double,RowMajor>* guess) {
   for (int i = 0; i < A->rows(); i++) {
     SparseMatrix<double,RowMajor> row = A->middleRows(i, 1);
@@ -220,7 +214,6 @@ void FGBGMatte::relax(SparseMatrix<double,RowMajor>* A, SparseMatrix<double,RowM
     double a_mat_coeff = A->coeff(i,i);
     double sum = f->coeff(i,0) - result.coeff(0,0)
                + a_mat_coeff * guess->coeff(i,0);
-    // ++sol_it; ++guess_it;
     guess->coeffRef(i, 0) = sum / a_mat_coeff;
   }
 }

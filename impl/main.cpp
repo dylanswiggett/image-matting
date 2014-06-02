@@ -12,10 +12,6 @@ using namespace Eigen;
 int main(int argc, char** argv) {
   SDL_Init(SDL_INIT_EVERYTHING);
 
-  // ImageManager("test_img/pooh_med.bmp").downsize()->downsize()->SaveTo("test_img/pooh_med_downsize.bmp");
-
-  // return 0;
-
   ImageManager img("test_img/pooh_med.bmp");
   ImageManager img_guess("test_img/pooh_med_guess.bmp");
 
