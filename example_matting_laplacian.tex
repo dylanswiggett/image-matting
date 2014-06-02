@@ -43,7 +43,7 @@ We now define $\bar{G}_k=I-G_k(G_k^TG_k)^{-1}G_k^T$, and can rewrite
 \[J(\alpha)=
 	\sum_k\bar{\alpha}_k^T\bar{G}_k^T
 	      \bar{G}_k\bar{\alpha}_k\]
-Note that in this form, we need only minimize $J$ in one variable rather than $3$. Finally, we expand our middle terms, $\bar{G}_k^T \bar{G}_k$, and find by algebra that
+Note that in this form, we need only minimize $J$ in one variable rather than three. Finally, we expand our middle terms, $\bar{G}_k^T \bar{G}_k$, and find by algebra that
 \[\bar{G}_k^T \bar{G}_k=\left(
 	\delta_{ij}-\frac{1}{|w_k|}\left[
 	1+\frac{1}{\frac{\epsilon}{|w_k|}+\sigma_k^2}
@@ -51,6 +51,6 @@ Note that in this form, we need only minimize $J$ in one variable rather than $3
 \right]\right)\]
 Plugging this back into our formula for $J(\alpha)$ and rewriting our sum as matrix composition, we have our desired equation.
 \end{proof}
-$L$ is our matting laplacian. Note that, since we sum over more values of $k$ when two pixels are closer together, the weights on edges are dependent on both color differences and distance apart. Further, when looked at in a slightly different way, it is actually just the graph laplacian with a different affinity function. This is as we stated previously. We define our adjacency matrix, $W$, by weights rather than by simple edge existence, so that for $i\neq j$, $W_{ij}=L_{ij}$, and $W_{ii}=0$. Then we define our degree matrix accordingly as a diagonal matrix with
+$L$ is our matting Laplacian. Note that, since we sum over more values of $k$ when two pixels are closer together, the weights on edges are dependent on both color differences and distance apart. Further, when looked at in a slightly different way, it is actually just the graph Laplacian with a different affinity function. This is as we stated previously. We define our adjacency matrix, $W$, by weights rather than by simple edge existence, so that for $i\neq j$, $W_{ij}=L_{ij}$, and $W_{ii}=0$. Then we define our degree matrix accordingly as a diagonal matrix with
 \[D_{ii}=\sum_j W_{ij}\]
-And our matting laplacian is found by $L=D-W$, exactly as we did for a graph laplacian.
+And our matting Laplacian is found by $L=D-W$, exactly as we did for a graph Laplacian.
