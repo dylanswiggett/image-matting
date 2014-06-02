@@ -64,7 +64,7 @@ SparseMatrix<double,RowMajor> *FGBGMatte::GetMatte() {
 
   SparseMatrix<double, RowMajor> *guess = guess_->GetGreyscaleMatrix();
 
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 10; i++) {
     std::cout << "Iter: " << i << std::endl; //";    Resid. Norm: " << (A * *g).norm() << std::endl;
     guess = solve(guess, (*f_matrices_)[0], 0);
   }
@@ -205,7 +205,7 @@ SparseMatrix<double, RowMajor>* FGBGMatte::solve(SparseMatrix<double,RowMajor>* 
   delete error_guess;
 
   // Relax on Au=f
-  // for (uint i = 0; i <= level; i++)
+  for (uint i = 0; i <= level; i++)
     relax(a_mat, f_vec, final_guess_vec);
 
   // Return the guess in image shape again!

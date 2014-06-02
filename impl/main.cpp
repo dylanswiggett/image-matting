@@ -9,7 +9,7 @@
 
 using namespace Eigen;
 
-#define SIZE 10000
+// #define SIZE 10000
 
 int main(int argc, char** argv) {
   SDL_Init(SDL_INIT_EVERYTHING);
@@ -27,18 +27,18 @@ int main(int argc, char** argv) {
   // }
   // m->makeCompressed();
 
-  ImageManager img("test_img/morrow.bmp");
-  ImageManager img_guess("test_img/morrow_guess.bmp");
+  ImageManager img("test_img/pooh_med.bmp");
+  ImageManager img_guess("test_img/pooh_med_guess.bmp");
 
-  // img_guess.SaveTo("test_img/morrow_guess_copy.bmp");
+  ImageManager(GridSampler(img_guess.GetGreyscaleMatrix()).upsample(img_guess.GetW() * 2, img_guess.GetH() * 2)).SaveTo("test_img/pooh_med_guess_copy.bmp");
 
-  // ImageManager(img.GetLaplacian()).SaveTo("test_img/morrow_laplacian.bmp");
+  // ImageManager(img.GetLaplacian()).SaveTo("test_img/pooh_med_laplacian.bmp");
 
   FGBGMatte matte(&img, &img_guess);
 
   ImageManager matte_img(matte.GetMatte());
 
-  matte_img.SaveTo("test_img/morrow_result.bmp");
+  matte_img.SaveTo("test_img/pooh_med_result.bmp");
   // ImageManager(img.GetGreyscaleMatrix()).SaveTo("test_img/small_2color_resave.bmp");
   // ImageManager(img_guess.GetGreyscaleMatrix()).SaveTo("test_img/small_2color_guess_resave.bmp");
 
